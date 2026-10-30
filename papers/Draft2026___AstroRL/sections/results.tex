@@ -1,0 +1,32 @@
+\section{Results}
+Final evaluation compares trained checkpoints on new episodes with learning disabled. The figures show individual seed results and bootstrap confidence intervals. Comparisons are made within each map.
+
+\subsection{Prediction-guided exploration without policy learning}
+Without RL, the MLP, No Astro, and random walk all sample actions uniformly and have identical coverage. Prediction learning alone leaves these policies unchanged. AstroRL and Trace change action probabilities through familiarity-dependent inhibition even though their motor readouts remain fixed.
+
+Both memory modules increase mean coverage relative to the uniform controls on every map (Fig.~\ref{fig:coverage}). The largest separation occurs on Branching, where memory-guided controllers explore substantially more of the environment. Trace has the higher mean coverage on each map, although AstroRL and Trace are close on Open and Branching. Appendix~\ref{app:descriptive} reports each map separately.
+
+Memory-guided exploration also reduces immediate backtracking and collisions (Appendix~\ref{app:figures}). Greater coverage, however, does not improve goal finding. On Open, no-RL Trace covers more cells but has lower mean normalized reward than the uniform baseline. The episode horizon is too short to permit full coverage of Open. Coverage comparisons therefore depend on both map size and goal termination.
+
+\input{sections/figure_coverage}
+
+\subsection{Prediction quality depends on the test distribution}
+Prediction quality on the common-input probe varies by map and learning regime (Fig.~\ref{fig:probe}). Without RL, the spiking predictors have higher accuracy on the smaller structured maps than on Open. The MLP has the highest mean balanced accuracy on Open; uniform spiking controls have higher means on several structured maps. Memory-guided exploration does not consistently improve prediction on these shared inputs.
+
+After RL, prediction scores can differ between a policy's own trajectories and the common-input probe. On Obstacles and Branching, AstroRL predicts next cells with near-ceiling accuracy along its own trajectories, while common-probe balanced accuracy is lower. Performance on the shared probe is weaker on Open. The summaries also differ in stratum weighting and episode averaging, so their gap cannot be attributed entirely to distribution shift. Accuracy on frequently visited routes can coexist with errors elsewhere. The appendix reports moving and collision strata, prediction-learning curves, and spatial error maps. Independent tuning also prevents differences in probe scores from being attributed solely to reward learning or the memory mechanism.
+
+\input{sections/figure_probe}
+
+\subsection{RL improves goal-directed performance unevenly across maps}
+The RL group learns motor parameters while prediction learning continues. All learned policies, including the MLP and No Astro, approach the reward ceiling on Open (Fig.~\ref{fig:reward}). Differences are clearer on the structured maps, where both memories achieve higher mean returns than No Astro and the MLP. This separation is most pronounced on Branching, where the controls perform poorly despite motor learning. AstroRL has the highest mean return on Obstacles and less variation across seeds than Trace. The memory variants have close mean returns on Rooms, while Trace has the higher mean on Branching. Their ordering therefore changes across tasks, with no consistent advantage for calcium memory.
+
+Appendix~\ref{app:figures} includes learning curves indexed by environment actions and diagnostics indexed by episodes. Reaching the goal earlier reduces both the episode cost and the number of observed transitions. Equal episode budgets therefore give unequal transition exposure, which limits sample-efficiency comparisons based on endpoints alone. Seed variability is reported for the tested maps; these evaluations do not test generalization to unseen maps.
+
+\input{sections/figure_reward}
+
+\subsection{The trained policy continues to depend on memory}
+Memory removal reduces reward on the structured maps with trained weights fixed (Fig.~\ref{fig:ablation}). The largest losses occur on Obstacles and Branching for both AstroRL and Trace. On Branching, the high returns obtained with memory collapse when it is disabled. Returns also fall on Rooms, although the controllers retain more of their performance. Changes on Open are smaller, especially for Trace.
+
+These ON/OFF differences show that the trained policy still uses memory during evaluation. They leave open what the actor would have learned without memory and why removal is costly; compensatory excitation is not established by this comparison. Without RL, disabling either memory restores uniform behavior, as expected from zero motor weights. The paired intervals summarize uncertainty in ON/OFF differences across training seeds.
+
+\input{sections/figure_ablation}

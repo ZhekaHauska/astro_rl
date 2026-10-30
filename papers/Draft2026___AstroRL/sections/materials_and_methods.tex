@@ -1,0 +1,86 @@
+\section{Materials and Methods}
+\subsection{Prediction learning and a detached motor policy}
+AstroRL combines a recurrent spiking representation with an action-conditioned transition predictor, a familiarity memory, and a separate spiking motor circuit (Fig.~\ref{fig:model}). Prediction learning continues throughout interaction in both groups. Without RL, the motor readout stays at its zero initialization. With RL, reward updates the motor readout and prediction error updates the recurrent representation. The actor network is detached from the RSNN.
+
+Let $t$ index time step, $o_t$ denote the observed position, and $z_t$ the filtered activity of the recurrent network. A fixed transformation $\varphi$ centers and scales this activity for the motor readout, then normalizes it by its Euclidean norm. Excitation of action channel $a\in\mathcal A$, where $\mathcal A$ is the action set, is
+\begin{equation}
+ I^{\mathrm E}_a(t)=I_0+A_I\tanh\!\left((W_{\rm actor}\,\operatorname{sg}[\varphi(z_t)]+b)_a\right),
+ \label{eq:actor}
+\end{equation}
+where $I_0$ is the baseline excitatory current and $A_I$ its modulation amplitude. The operator $\operatorname{sg}$ leaves its argument unchanged in the forward pass and stops its gradient. Only the RL group learns the matrix $W_{\rm actor}$ and bias $b$. The recurrent weights continue to learn from prediction, and policy changes affect the transitions used for that learning. Detachment therefore separates the parameter updates without fixing the representation or its training data. The motor circuit has direct action channels and no hidden motor layer. Appendix~\ref{app:protocol} gives dimensions, initialization, and numerical settings.
+
+
+
+\subsection{Writing actual experience and querying candidate outcomes}
+The memory uses fixed, overlapping spatial receptive fields as addresses. For feature $i$, the Gaussian response to the current observation is retained among the most active fields and normalized to give $u_i(o_t)$. Neither the fields nor the controller receives a wall map, goal coordinate, shortest-path distance, or visited-cell table.
+
+The astrocytic bank uses a glutamate variable $g_i$ and a reduced calcium variable $C_i$. During the write window for observation $o_t$, feature-dependent Poisson release with rate $\rho_g u_i(o_t)$ drives
+\begin{align}
+ \dot g_i&=-g_i/\tau_g+q_g\sum_k\delta(s-s_{ik}),\\
+ \ddot C_i+\frac{2}{\tau_C}\dot C_i+\frac{C_i}{\tau_C^2}
+ &=\frac{A_C}{\tau_C^2}\,\mathbf1\{g_i>g_{\rm th}\}.
+\end{align}
+Here $s$ is the memory simulation time, dots denote derivatives with respect to $s$, and $s_{ik}$ is the time of release event $k$ in channel $i$. The parameter $\rho_g$ sets the release rate for a fully active feature, $q_g$ is the glutamate increment per event, and $\delta$ is the Dirac delta. The positive time constants $\tau_g$ and $\tau_C$ govern glutamate clearance and calcium dynamics, respectively; $A_C$ is the calcium response amplitude, $g_{\rm th}$ is the glutamate activation threshold, and $\mathbf1\{\cdot\}$ is the indicator function. The calcium-derived memory is
+\begin{equation}
+ m_i=\operatorname{clip}\!\left(\frac{C_i-\theta_C}{A_C-\theta_C},0,1\right).
+\end{equation}
+Here $\theta_C<A_C$ is the calcium readout threshold, and $\operatorname{clip}(x,l,u)$ bounds $x$ between $l$ and $u$.
+The reduced glutamate--calcium dynamics follow Tsybina et al. \cite{tsybina2026}. The present controller uses distributed feature addresses and learned queries for candidate outcomes. The implementation advances discrete release events and integrates calcium analytically over intervals of constant forcing.
+
+Before selecting an action, the current observation writes to memory. The predictor evaluates each candidate action using the current recurrent representation:
+\begin{equation}
+ (\widehat u^{(a)}_{t+1},\widehat o^{(a)}_{t+1})=P_\omega(z_t,a).
+\end{equation}
+Here $\omega$ denotes the predictor parameters, and $\widehat o^{(a)}_{t+1}$ is the predicted next position. The feature prediction $\widehat u^{(a)}_{t+1}$ is a distribution normalized to sum to one. Its overlap with the current memory gives familiarity,
+\begin{equation}
+ f_a=\frac{\sum_i\widehat u_{t+1,i}^{(a)}m_i}{\sum_i\widehat u_{t+1,i}^{(a)}},\qquad
+ h_a=\operatorname{clip}\!\left(\frac{f_a-\min_{a'\in\mathcal A} f_{a'}}{c_f},0,h_{\max}\right).
+ \label{eq:familiarity}
+\end{equation}
+Here $c_f>0$ sets the familiarity contrast scale, and $h_{\max}>0$ is the gate cap. Predicted outcomes are compared with the current memory to compute familiarity; only actual observations update the memory state. The relative gate compares candidates at the current decision and leaves a least-familiar action unsuppressed. It biases action probabilities while allowing revisits; it provides no legal-action mask.
+
+\subsection{Inhibitory recruitment and action selection}
+Familiarity changes the threshold of an action-specific inhibitory leaky integrate-and-fire (LIF) neuron,
+\begin{equation}
+ \vartheta^{\mathrm I}_a=\frac{\vartheta^{\mathrm I}_0}{1+\kappa_h h_a}.
+\end{equation}
+Here $\vartheta^{\mathrm I}_0$ is the baseline inhibitory threshold and $\kappa_h\geq0$ is the familiarity gain. Inhibition acts in this motor circuit, not inside the adaptive LIF (ALIF) network, and uses a current-based approximation rather than a biophysical conductance-based synapse. Motor spike counts $n_a$ after a warmup interval define
+\begin{equation}
+ \pi(a\mid z_t,m_t)=
+ \frac{\exp[n_a/(L_{\rm eff}\mathcal T)]}{\sum_{a'\in\mathcal A}\exp[n_{a'}/(L_{\rm eff}\mathcal T)]}.
+\end{equation}
+Here $m_t$ is the vector of memory activities at decision $t$, $L_{\rm eff}$ is the number of decoded motor ticks, and $\mathcal T>0$ is the selected decoder temperature. An action is sampled from this distribution. Motor membrane and eligibility states reset for each decision; recurrent and memory states persist within an episode and reset between episodes. The recurrent, motor, and calcium simulations advance on separate clocks.
+
+\subsection{Prediction updates and local eligibility}
+The recurrent network contains regular and adaptive LIF neurons. Symmetric e-prop combines forward synaptic eligibility factors with a prediction learning signal \cite{bellec2020}. The predictor learns three targets: the next spatial feature distribution, next coordinates, and a reconstruction $\widehat o_t$ of current coordinates from $z_t$ through a separate decoder. For an episode of $T$ environment decisions, its loss is
+\begin{equation}
+ \begin{aligned}
+ \mathcal L_{\rm pred}=\frac{1}{T}\sum_{t=0}^{T-1}\bigl[&\lambda_u\operatorname{CE}(\overline u_{t+1},\widehat u_{t+1})
+ +\lambda_o\operatorname{MSE}(\widehat o_{t+1},o_{t+1})\\
+ &+\lambda_d\operatorname{MSE}(\widehat o_t,o_t)\bigr],
+ \end{aligned}
+\end{equation}
+where $\overline u_{t+1}=u(o_{t+1})/\sum_i u_i(o_{t+1})$, and the next-state predictions correspond to the action actually taken. The nonnegative coefficients $\lambda_u$, $\lambda_o$, and $\lambda_d$ weight feature cross-entropy (CE), next-position mean squared error (MSE), and current-position reconstruction MSE, respectively. Each term is averaged over the current episode. The signal $\partial\mathcal L_{\rm pred}/\partial z_{t,j}$ is combined with the stored, filtered local eligibility $\overline e_{ij,t}$ to approximate the recurrent gradient:
+\begin{equation}
+ \frac{\partial\mathcal L_{\rm pred}}{\partial\theta_{ij}}
+ \approx\sum_{t=0}^{T-1}\frac{\partial\mathcal L_{\rm pred}}{\partial z_{t,j}}\,\overline e_{ij,t}.
+\end{equation}
+Here $\theta_{ij}$ is the recurrent weight from neuron $i$ to neuron $j$, $z_{t,j}$ is the filtered activity of neuron $j$, and $\overline e_{ij,t}$ is the filtered local eligibility for that weight. The non-spiking prediction heads use ordinary differentiation. A single update after each episode changes the recurrent weights. Additional prediction updates refit the heads using stored observations and cached representations. Replay adds no environment transitions and does not update the actor. It sends no reward signal to the recurrent network.
+
+\subsection{Reward-based motor learning}
+Motor learning uses an episodic REINFORCE objective \cite{williams1992}. Define $G_t=\sum_{k=t}^{T-1}\gamma^{k-t}r_k$, where $r_k$ is the reward after action $k$ and $\gamma\in[0,1]$ is the discount factor. A time-indexed baseline $\overline G_t$ is estimated from preceding episodes. Let $\theta_{\rm actor}=(W_{\rm actor},b)$ denote the actor parameters. The motor update uses the surrogate ascent direction for the policy objective $\mathcal J$,
+\begin{equation}
+ \nabla_{\theta_{\rm actor}}\mathcal J\approx
+ \sum_{t=0}^{T-1}\frac{\gamma^t}{H}
+ \left[(G_t-\overline G_t)\nabla\log\pi_t(a_t)
+ +\beta_{\mathcal H}\nabla\mathcal H(\pi_t)\right].
+ \label{eq:rl}
+\end{equation}
+All gradients in Eq.~\ref{eq:rl} are taken with respect to $\theta_{\rm actor}$. Here $\pi_t(a)=\pi(a\mid z_t,m_t)$, $\mathcal H(\pi_t)=-\sum_{a\in\mathcal A}\pi_t(a)\log\pi_t(a)$ is policy entropy, and $\beta_{\mathcal H}\geq0$ is its regularization coefficient. The normalization uses the maximum episode horizon $H$, with $T\leq H$. The forward policy uses hard motor spikes; local forward sensitivities supply surrogate derivatives, with reset and refractory state detached. Equation~\ref{eq:rl} gives a single-episode surrogate estimate of the ascent direction; unbiasedness of the hard-spike policy score is not assumed. Actor weights stay fixed during an episode. Afterward, the actor is updated before the prediction system, and the baseline is updated after the actor direction has been computed. There is no learned critic.
+
+\subsection{Comparison and evaluation design}
+We compare No Astro, AstroRL, a neuronal-trace memory replacement, a feedforward MLP control, and a uniform random walk. The spiking variants have the same architectural dimensions. The MLP uses local derivatives and fixed direct feedback to hidden layers, following the idea of direct feedback alignment \cite{nokland2016}. Its learning algorithm and parameter count differ from those of recurrent e-prop. Appendix~\ref{app:protocol} specifies the trace, MLP, tasks, reward, training budgets, and selected settings.
+
+Development seeds are used to select a configuration independently for each model, learning group, and map. Final seeds evaluate those configurations on the same maps. Model comparisons therefore include differences in selected parameters as well as memory dynamics. They neither isolate a single memory parameter nor equate computational cost, and they do not test transfer to unseen maps.
+
+Final evaluation fixes all learned parameters. Memory ON and OFF use the same checkpoint, starting positions, and random numbers for action sampling. ON updates memory from actual observations; OFF bypasses the bank and its motor effect. Trajectories can diverge as soon as the sampled actions differ. A separate common-input probe tests prediction on identical forced-random contexts independently of each policy's trajectories. Appendix~\ref{app:stats} describes seed uncertainty, multiplicity, and the limits of the numerical evidence.

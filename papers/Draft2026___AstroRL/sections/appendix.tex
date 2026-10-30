@@ -1,0 +1,105 @@
+\section{Experimental specification and selected settings}\label{app:protocol}
+\subsection{Tasks and replication}
+The tasks are Open $13\times13$, Obstacles $7\times7$, Rooms $9\times9$, and Branching $7\times7$ (Fig.~\ref{fig:maps}). The goal is the lexicographically last free cell. Starting positions are sampled uniformly from the remaining free cells. Blocked cardinal actions leave the position unchanged and consume an action. Episodes end on the first goal arrival or after 50 actions. The same four maps are used for configuration selection, training, and final evaluation, with final seeds providing replication on each task.
+
+The design crosses two learning groups, five controller families, four maps, and ten final seeds (62000--62009), giving 400 trained instances. Each trains for 600 episodes and receives 100 new evaluation episodes per mode with learning disabled. AstroRL and Trace are evaluated with memory ON and OFF at the same checkpoint. Starting positions and random numbers for action sampling are shared within seed, including across learning groups. All dynamical states reset between episodes. ALIF state also resets for each probe context, and motor state resets for every decision. The memory bank is created and updated only in rollouts with memory enabled.
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth]{figures/environments.pdf}
+\caption{\textbf{Exact environment layouts from the supplied protocol.} Dark cells are walls and stars mark fixed goals. Starts vary over the other free cells. The panels have 169, 38, 68, and 31 free cells. Maximum shortest-path distances to the goal are 24, 17, 16, and 22 actions, respectively. These distances and connectivity were checked directly from the supplied free-cell lists; BFS is used only by the evaluator. The Branching map is a tree (30 undirected edges for 31 cells). Coordinates shown below panels are zero-based row/column indices.}\label{fig:maps}\end{figure}
+
+
+\subsection{State lifetime and update order}\label{app:state}
+The recurrent state and active familiarity memory persist between decisions within an episode. The motor circuit starts afresh at each decision. A new episode creates a fresh recurrent core and, when enabled, a fresh memory bank. Information from earlier episodes persists through learned parameters and training records, with no residual calcium or recurrent activation.
+
+\input{tables/state_lifetime}
+
+At each decision, the observed position supplies the recurrent representation and four candidate predictions. If memory is active, the actual spatial features are then written to the bank. Overlap between predicted features and the updated memory sets inhibitory thresholds, after which the motor circuit generates the action distribution. The chosen action produces a transition record. After an episode, the RL group updates the actor using stored motor sensitivities and returns. The prediction update then changes the predictor and recurrent core. Additional replay updates refit prediction heads from cached representations. No-RL omits the actor update, and evaluation omits all parameter updates.
+
+\subsection{Reward and outcome definitions}
+An attempted action receives $r_t=\mathbf1\{\text{goal reached}\}-0.01$. For an episode of $T$ actions and success indicator $S$, return is $R=S-0.01T$. If $d^*$ is the shortest legal route from its start, the plotted reward is
+\begin{equation}
+ R_{01}=\frac{R+0.5}{1.5-0.01d^*}.
+\end{equation}
+Thus a failed 50-action episode is zero, and an optimal successful episode is one. Training uses discounted returns with $\gamma=0.99$, whereas $R_{01}$ describes undiscounted evaluation return.
+
+The raw route statistic $d^*/T$ remains positive when an episode fails. We therefore also report the goal-adjusted statistic $S d^*/T$, which assigns zero to failure, and success as an auxiliary outcome. Counts of actions per episode and total training actions include failures and reveal differences in transition budgets.
+
+Coverage is the fraction of free cells visited, including the starting cell. Horizon-50 Coverage AUC averages post-action coverage over 50 positions. If the goal ends an episode early, the final coverage value is held constant for the remaining positions, without adding visits. Immediate backtracking counts successful moves that return to the preceding position and divides by successful moves. Collision rate divides blocked attempts by actual actions. Occupancy counts source cells before actions; arrival maps count destination cells afterward, including terminal goal arrivals. Spatial count maps are normalized within seed before averaging.
+
+Prediction accuracy is computed after rounding normalized next-position coordinates to a grid cell. MSE averages squared error in $[0,1]$ coordinates. Balanced accuracy is the mean of accuracy on moving and collision transitions. For an on-policy episode containing only one transition type, the implementation uses overall episode accuracy instead. The common probe contains both types, so comparisons with on-policy scores must account for this difference. On-policy quantities are averaged within episode and then within seed. A persistence predictor always predicts the current position. Its accuracy therefore equals the collision fraction, which can be high even without learning how the agent moves.
+
+The common-input probe contains 128 forced-random contexts of four transitions, giving 512 examples per seed. Every model receives the same source coordinates and candidate actions. Probe transitions can include goal cells without terminating the context. The probe tests prediction offline and contributes no training or policy-evaluation episodes. Progress probes at episodes 0, 100, \ldots, 600 use a different random split from the separate final probe. Neither weights nor baseline are updated on these examples.
+
+\subsection{Architecture, initialization, and local updates}\label{app:architecture}
+The spiking controllers use 24 fixed random-projection input channels and a 100-neuron Bellec-style recurrent network, half adaptive and half regular LIF. Input and recurrent weight matrices are signed, with autapses masked. The core has no Dale-constrained excitatory/inhibitory partition. Observed positions are normalized by grid size. The encoder accepts a previous action, but \texttt{input\_action\_gain} is zero in the selected study configuration. Candidate action one-hot inputs enter the predictor separately.
+
+Each observation runs for 128 recurrent steps of 1 ms. Membrane, adaptation, and output-filter time constants are 20, 2000, and 40 ms. The spike threshold is 0.6, the refractory period is 5 steps, surrogate damping is 0.3, and the adaptive threshold scale is $1.7(1-\rho)/(1-\alpha)$. The readout uses the last filtered activity. These values are model settings, not universal neuronal constants. Initial input and recurrent random-weight scales are 0.05 and 0.1. The internal current bias is calibrated on 128 uniformly sampled, map-independent coordinates to target a non-adaptive 10-Hz operating point. Motor features are centered and scaled using an initial map-independent coordinate sample, with a standard-deviation floor of 0.002. They are then normalized to unit length using a numerical stabilizer. Calibration statistics remain fixed after initialization.
+
+The SNN predictor uses an action-conditioned $(100+4)\to128\to128$ tanh trunk with a 64-feature softmax output and a two-coordinate sigmoid output. A separate $100\to128\to2$ decoder reconstructs the current observation. Loss weights are 1 for feature cross-entropy, 20 for next-coordinate MSE, and 5 for current-coordinate MSE. The 64 memory features have centers on a uniform $8\times8$ lattice, Gaussian width 0.16, top-four sparsification, and maximum-response normalization. Spiking variants share their initial recurrent and predictor weights within seed. The study600 constructor loads no pretrained checkpoint.
+
+The recurrent eligibility calculation retains adaptive-threshold feedback and stops derivatives through recurrent spike transmission and reset. Its surrogate is triangular near threshold. The first update after an episode combines current-episode prediction feedback with stored recurrent eligibilities. Adam gradients are clipped to norm 1, and the resulting recurrent parameter increment is capped at the selected norm. A replay buffer stores at most 6000 transition records with cached representations. Additional predictor updates sample 128 records and refit the heads with gradients clipped to norm 5. These updates leave the recurrent network and actor unchanged.
+
+At recurrent tick $n$, membrane and adaptation evolve as
+\begin{align}
+ b_j^n &= \rho b_j^{n-1}+s_j^{n-1},\\
+ v_j^n &= \alpha v_j^{n-1}+\sum_i W^{\rm in}_{ij}x_i^n
+           +\sum_k W^{\rm rec}_{kj}s_k^{n-1}-\vartheta_0s_j^{n-1},\\
+ B_j^n &= \vartheta_0+\beta_j b_j^n,\qquad
+ s_j^n=\mathbf1\{v_j^n>B_j^n\}\mathbf1\{j\text{ is not refractory}\},\\
+ z_j^n &= \kappa z_j^{n-1}+(1-\kappa)s_j^n.
+\end{align}
+Here $x^n$ contains the regular encoder's binary spikes and a constant current-bias channel; $\alpha$, $\rho$, and $\kappa$ are the exponential decay factors for membrane, adaptation, and filtered output. The adaptive coefficient $\beta_j$ is zero for regular LIF neurons. Recurrent diagonal weights are masked. The readout uses the final $z^n$ after the observation's 128 ticks.
+
+For a synapse with presynaptic drive $p_i^n$, the local eligibility calculation is
+\begin{align}
+ \epsilon^{v,n}_{ij}&=\alpha\epsilon^{v,n-1}_{ij}+p_i^n,\qquad
+ \epsilon^{b,n}_{ij}=\rho\epsilon^{b,n-1}_{ij}+e^{n-1}_{ij},\\
+ e^n_{ij}&=\psi_j^n(\epsilon^{v,n}_{ij}-\beta_j\epsilon^{b,n}_{ij}),\qquad
+ \overline e^n_{ij}=\kappa\overline e^{n-1}_{ij}+(1-\kappa)e^n_{ij},
+\end{align}
+with $\psi_j^n=(0.3/\vartheta_0)\max(0,1-|\left(v_j^n-B_j^n\right)/\vartheta_0|)$ outside the refractory period and zero inside it. The recurrent mask also multiplies recurrent eligibilities. The input drive is the current encoder spike or constant bias, whereas the recurrent drive is the preceding presynaptic spike. These forward factors are paired with the prediction learning signal; the motor reward signal does not enter this recurrence.
+
+The motor head is $100\to4$, with four trainable biases before tanh and one LIF neuron per action. It has no hidden layer or neuron population averaging. The motor matrix and raw biases start at zero. Each window has 60 steps of 3 ms; the first 12 are excluded from decoded counts. Motor threshold is 1, with refractory settings of 3 motor steps and 6 inhibitory steps. The inhibitory base threshold and current are 1.25 and 1.12. The spike-driven inhibitory state decays by 0.78 per motor tick. Forward sensitivities use a fast-sigmoid surrogate of width 6, with hard reset and refractory state detached. Gradients are clipped to norm 1 before the actor Adam update. The time-indexed baseline is an EMA with weights 0.95 and 0.05 and is updated after actor credit is computed. Adam moments are 0.9 and 0.999, with stabilizer $10^{-8}$. Actor learning rate, entropy coefficient, and motor temperature interpolate linearly between selected initial and final settings during RL. For episode $e=1,\ldots,600$, the interpolation fraction is $\min[1,(e-1)/\max(1,599a)]$, where $a$ is the selected annealing fraction. No-RL retains initial settings; final evaluation retains the settings reached at the end of training.
+
+For the astrocyte bank, feature-dependent release has intensity $15u_i$ events/s and glutamate increment 0.2. Glutamate decays with a 1-s time constant; its threshold is 0.2, calcium forcing amplitude 0.73, and write duration 1 s. The one-timescale neuronal trace instead uses
+\begin{equation}
+ m_i' = e^{-\Delta s/\tau}m_i + k_m(1-e^{-\Delta s/\tau})u_i,
+\end{equation}
+followed by clipping to $[0,1]$ at readout. This trace replaces the familiarity state only. Motor eligibility is present in every RL spiking arm and is separate from the trace-memory control. Calcium threshold, memory timescale, trace gain, gate contrast/gain, and motor calibration are selected independently. The comparison uses one exponential trace, with memory removed only during frozen evaluation.
+
+The MLP control has a $2\to64\to64\to4$ ReLU policy and an independent $(2+4)\to64\to64\to68$ prediction network. The policy output matrix starts at zero. Fixed random output-to-hidden feedback supplies hidden learning signals, which are multiplied by local ReLU derivatives and presynaptic activity. This gives a feedforward local-eligibility/DFA control, distinct from recurrent e-prop. Predictor hidden layers receive one update from the current episode; replay refits the output layer. The gradient clip is 5, with a separately selected cap on the prediction hidden-layer update. The spiking design contains 64,556 learned-parameter entries, including the 404-entry motor head. The MLP contains 13,640 entries (4,612 policy and 9,028 prediction). Counts use active parameter shapes and exclude fixed encoders, fixed feedback, optimizer state, and unused legacy modules. Masked autapses are stored and counted. These parameter counts do not imply equal FLOPs or runtime.
+
+\input{tables/prediction_settings}
+\input{tables/motor_settings}
+\input{tables/actor_settings}
+\input{tables/memory_settings}
+\input{tables/mlp_settings}
+
+\subsection{Selection procedure and source versions}
+Each of 40 combinations of learning group, model, and map has 18 candidate configurations. Screening uses two seeds (61000--61001) and 200 episodes. The best four candidates proceed to confirmation with three seeds (61100--61102) at 600 episodes. The best two then proceed to validation with five seeds (61200--61204) at 600 episodes. Selection maximizes the mean objective minus 0.25 sample SD. The design specifies 2320 tuning runs and 400 final runs. The random-walk policy remains fixed in both groups, including the group labelled RL.
+
+The no-RL objective is $0.4$ Coverage AUC $+0.2$ novelty/action $+0.4$ common-probe balanced accuracy. The RL objective is $0.5R_{01}+0.3d^*/T+0.2$ common-probe balanced accuracy. Random walk uses the no-RL objective in both groups. The raw route ratio contributes positively even on failed runs, which limits its interpretation; the failure-adjusted metric is also reported. An 18-candidate allocation does not equate compute across controller families. Independently selected settings also prevent a comparison that isolates only the memory mechanism. Evaluation uses the checkpoint at episode 600, without selecting the best evaluation checkpoint.
+
+The experiment environment record lists Python 3.10.12, NumPy 2.2.6, PyTorch 2.12.0, SciPy 1.15.3, pandas 2.3.3, Matplotlib 3.10.9, and Numba 0.68.0. The launcher requests 30 workers and one BLAS/OMP thread per worker. All 140 entries in the training-source SHA256 manifest, and its aggregate digest, match the attached code snapshot. This verifies consistency between the snapshot and manifest; the training run was not reproduced.
+
+\section{Descriptive summaries and statistical interpretation}\label{app:descriptive}
+\input{tables/coverage_means}
+\input{tables/reward_means}
+\FloatBarrier
+
+\subsection{Seed uncertainty and finite exact-test resolution}\label{app:stats}
+Training seeds are the replication units within each map, with ten seeds per condition. Evaluation episodes are averaged within seed. Endpoint intervals use percentile bootstrapping with 5000 seed resamples. Training bands use 2000 draws and are pointwise. Training observations are smoothed within seed over the preceding 20 episodes; shared-input prediction checkpoints and final evaluation are unsmoothed. Action-axis displays interpolate within each seed's observed action range without extrapolation.
+
+The analysis pairs seeds for ON/OFF and model-minus-No-Astro contrasts and enumerates all $2^{10}$ sign patterns for a two-sided exact sign-flip test. Holm correction is applied separately to 48 no-RL primary comparisons (four maps, three outcomes, four comparators), 32 RL primary comparisons (four maps, two outcomes, four comparators), and 80 memory comparisons (two groups, four maps, two memory arms, five outcomes). The two-sided test includes both fully aligned sign patterns, giving
+\begin{equation}
+ p_{\min}=2/2^{10}=0.001953125.
+\end{equation}
+At a family-wise level of 0.05, the first Holm thresholds are $0.05/48$, $0.05/32$, and $0.05/80$, all below $p_{\min}$. No hypothesis in these families can therefore be rejected by the implemented procedure at that level. The smallest possible adjusted values are 0.09375, 0.0625, and 0.15625. This bound follows from finite test resolution; it is not an observed-power calculation. The paired randomization interpretation also requires sign exchangeability, which exact enumeration does not establish. A zero-mean null alone is insufficient. Unadjusted paired intervals can exclude zero while every Holm-adjusted test fails to reject. We therefore describe effects without claiming corrected significance or equivalence.
+
+\subsection{Data provenance and verification scope}\label{app:evidence}
+The study archive contains code, protocol, 40 selected configurations, 78 PDF/SVG/PNG figure sets, and captions. The numerical per-seed evaluation and common-probe CSVs are absent, as are training histories, paired-comparison exports, verification logs, compute-budget tables, and checkpoints referenced by the report generator. Endpoint means in the text were therefore recovered from editable SVG coordinates and rounded to two decimals. The original figures retain their intervals and individual points. Graphical readings cannot replace numerical tables, and point order does not identify seeds. No paired test, bootstrap interval, checkpoint reload, or full training run was reconstructed from these points.
+
+Local checks cover the code manifest, map topologies and distances, test-resolution bound, and forty-case configuration matrix. They also confirm uniform motor probabilities at zero readout in all 24 selected spiking configurations using the original motor arithmetic with the optional JIT decorator removed. The study600 update initializes \texttt{policy\_core\_gradient\_norm} to the literal value zero. That log entry is therefore not an independent measurement of detachment. Detachment follows from the separate NumPy motor computation and prediction-only recurrent update. The source contains broader checks, but their execution logs and checkpoint evidence are absent, so those checks are not claimed as independently reproduced.
+
+ChatGPT (OpenAI), with guidance from Scientific Agent Skills \cite{kassis2026}, assisted with code inspection, figure selection, reference checks, language editing, and LaTeX preparation. Literature checks covered the background and methods relevant to this computational study and were not a systematic review. The author is responsible for scientific verification and approval.

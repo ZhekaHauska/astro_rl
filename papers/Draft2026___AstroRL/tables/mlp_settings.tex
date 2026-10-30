@@ -1,0 +1,15 @@
+\begin{table}[htbp]\centering\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\caption{Hidden-layer prediction settings for the feedforward MLP. Only the current-episode prediction update changes hidden layers; replay updates the readout. Table~\ref{tab:prediction_settings} gives the prediction readout rate and number of updates. All trainable RL policy layers use the actor learning rate.}\label{tab:mlp_settings}
+\begin{tabular}{@{}llll@{}}\toprule
+G & Map & Hidden $\eta_P$ & Hidden update cap\\\midrule
+N & Open & 0.003 & 0.025\\
+N & Obstacles & 0.001 & 0.1\\
+N & Rooms & 0.0003 & 0.25\\
+N & Branching & 0.003 & 0.1\\
+R & Open & 0.003 & 0.1\\
+R & Obstacles & 0.003 & 0.25\\
+R & Rooms & 0.001 & 0.25\\
+R & Branching & 0.003 & 0.025\\
+\bottomrule\end{tabular}
+\end{table}

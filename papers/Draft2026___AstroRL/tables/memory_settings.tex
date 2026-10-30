@@ -1,0 +1,23 @@
+\begin{table}[htbp]\centering\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\caption{Selected memory settings. Time constants are in seconds on the memory simulation clock. Trace gain applies only to the trace and calcium threshold only to the calcium bank. Both use the gate contrast and gain. Calcium amplitude is 0.73, glutamate threshold 0.2, write duration 1 s, and gate cap 1. These are implementation settings, not universal physiological constants.}\label{tab:memory_settings}
+\begin{tabular}{@{}llllllll@{}}\toprule
+G & Map & Memory & $\tau$ & Trace gain & $\theta_C$ & $c_f$ & $\kappa_h$\\\midrule
+N & Open & Ca & 2.4 & -- & 0.1 & 0.4 & 1\\
+N & Open & Trace & 8 & 4 & -- & 0.1 & 2\\
+N & Obstacles & Ca & 1.2 & -- & 0.01 & 0.1 & 2\\
+N & Obstacles & Trace & 8 & 4 & -- & 0.2 & 2\\
+N & Rooms & Ca & 2.4 & -- & 0.03 & 0.4 & 3\\
+N & Rooms & Trace & 16 & 1 & -- & 0.4 & 3\\
+N & Branching & Ca & 1.2 & -- & 0.01 & 0.1 & 3\\
+N & Branching & Trace & 32 & 2 & -- & 0.2 & 3\\
+R & Open & Ca & 0.6 & -- & 0.03 & 0.2 & 1\\
+R & Open & Trace & 2 & 1 & -- & 0.4 & 2\\
+R & Obstacles & Ca & 1.2 & -- & 0.03 & 0.4 & 0.5\\
+R & Obstacles & Trace & 4 & 0.5 & -- & 0.2 & 2\\
+R & Rooms & Ca & 0.6 & -- & 0.03 & 0.2 & 1\\
+R & Rooms & Trace & 8 & 2 & -- & 0.2 & 2\\
+R & Branching & Ca & 2.4 & -- & 0.03 & 0.4 & 1\\
+R & Branching & Trace & 2 & 2 & -- & 0.1 & 0.5\\
+\bottomrule\end{tabular}
+\end{table}

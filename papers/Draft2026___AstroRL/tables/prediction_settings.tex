@@ -1,0 +1,52 @@
+\begingroup\footnotesize\setlength{\tabcolsep}{3.5pt}\begin{longtable}{@{}lllllllll@{}}
+\caption{Prediction settings for all 40 combinations of model, learning group, and map. N: no RL; R: RL; RW: random walk; NoA: No Astro; Ca: AstroRL. Readout and recurrent learning rates are separate. Core cap bounds the parameter-update norm after Adam. $E$ is the number of prediction-head updates per episode, and $s_z$ scales predictor inputs. MLP has no recurrent core. The accompanying JSON/CSV retains all selected settings, including unused fields.}\label{tab:prediction_settings}\\
+\toprule
+G & Map & Model & ID & $\eta_P$ & $\eta_{\rm core}$ & Core cap & $E$ & $s_z$\\\midrule
+\endfirsthead
+\multicolumn{9}{l}{\textit{Table \thetable\ continued}}\\
+\toprule
+G & Map & Model & ID & $\eta_P$ & $\eta_{\rm core}$ & Core cap & $E$ & $s_z$\\\midrule
+\endhead
+\midrule\multicolumn{9}{r}{\textit{Continued on next page}}\\\endfoot
+\bottomrule\endlastfoot
+N & Open & MLP & c13 & 0.001 & -- & -- & 16 & --\\
+N & Open & RW & c14 & 0.001 & 0.0001 & $5\!\times10^{-5}$ & 16 & 25\\
+N & Open & NoA & c00 & 0.001 & 0.0003 & $5\!\times10^{-5}$ & 16 & 50\\
+N & Open & Ca & c14 & 0.001 & 0.0006 & 0.0001 & 16 & 75\\
+N & Open & Trace & c10 & 0.003 & 0.0001 & 0.0001 & 16 & 25\\
+N & Obstacles & MLP & c08 & 0.003 & -- & -- & 16 & --\\
+N & Obstacles & RW & c08 & 0.001 & 0.0006 & 0.0001 & 16 & 50\\
+N & Obstacles & NoA & c00 & 0.001 & 0.0003 & $5\!\times10^{-5}$ & 16 & 50\\
+N & Obstacles & Ca & c07 & 0.001 & 0.0003 & $2.5\!\times10^{-5}$ & 16 & 50\\
+N & Obstacles & Trace & c13 & 0.0005 & 0.0001 & $5\!\times10^{-5}$ & 16 & 25\\
+N & Rooms & MLP & c15 & 0.003 & -- & -- & 16 & --\\
+N & Rooms & RW & c06 & 0.001 & 0.0003 & $2.5\!\times10^{-5}$ & 16 & 25\\
+N & Rooms & NoA & c02 & 0.003 & 0.0003 & $5\!\times10^{-5}$ & 16 & 25\\
+N & Rooms & Ca & c10 & 0.003 & 0.0006 & $2.5\!\times10^{-5}$ & 8 & 50\\
+N & Rooms & Trace & c17 & 0.001 & 0.0003 & 0.0001 & 16 & 75\\
+N & Branching & MLP & c10 & 0.003 & -- & -- & 16 & --\\
+N & Branching & RW & c06 & 0.001 & 0.0003 & $2.5\!\times10^{-5}$ & 16 & 50\\
+N & Branching & NoA & c01 & 0.001 & 0.0003 & $2.5\!\times10^{-5}$ & 16 & 50\\
+N & Branching & Ca & c16 & 0.001 & 0.0006 & 0.0001 & 16 & 50\\
+N & Branching & Trace & c08 & 0.0005 & 0.0006 & $5\!\times10^{-5}$ & 16 & 50\\
+R & Open & MLP & c03 & 0.0005 & -- & -- & 16 & --\\
+R & Open & RW & c00 & 0.001 & 0.0003 & $5\!\times10^{-5}$ & 16 & 50\\
+R & Open & NoA & c09 & 0.001 & 0.0003 & $5\!\times10^{-5}$ & 16 & 75\\
+R & Open & Ca & c00 & 0.001 & 0.0003 & $5\!\times10^{-5}$ & 16 & 50\\
+R & Open & Trace & c16 & 0.001 & 0.0001 & $2.5\!\times10^{-5}$ & 16 & 25\\
+R & Obstacles & MLP & c05 & 0.0005 & -- & -- & 4 & --\\
+R & Obstacles & RW & c00 & 0.001 & 0.0003 & $5\!\times10^{-5}$ & 16 & 50\\
+R & Obstacles & NoA & c16 & 0.003 & 0.0006 & 0.0001 & 8 & 50\\
+R & Obstacles & Ca & c01 & 0.001 & 0.0003 & $2.5\!\times10^{-5}$ & 16 & 75\\
+R & Obstacles & Trace & c15 & 0.003 & 0.0003 & $5\!\times10^{-5}$ & 4 & 75\\
+R & Rooms & MLP & c01 & 0.0005 & -- & -- & 16 & --\\
+R & Rooms & RW & c15 & 0.001 & 0.0006 & $2.5\!\times10^{-5}$ & 16 & 50\\
+R & Rooms & NoA & c00 & 0.001 & 0.0003 & $5\!\times10^{-5}$ & 16 & 50\\
+R & Rooms & Ca & c00 & 0.001 & 0.0003 & $5\!\times10^{-5}$ & 16 & 50\\
+R & Rooms & Trace & c00 & 0.001 & 0.0003 & $5\!\times10^{-5}$ & 16 & 50\\
+R & Branching & MLP & c07 & 0.003 & -- & -- & 8 & --\\
+R & Branching & RW & c00 & 0.001 & 0.0003 & $5\!\times10^{-5}$ & 16 & 50\\
+R & Branching & NoA & c17 & 0.003 & 0.0001 & $5\!\times10^{-5}$ & 8 & 75\\
+R & Branching & Ca & c14 & 0.003 & 0.0001 & $2.5\!\times10^{-5}$ & 8 & 75\\
+R & Branching & Trace & c08 & 0.003 & 0.0003 & $2.5\!\times10^{-5}$ & 16 & 25\\
+\end{longtable}\endgroup

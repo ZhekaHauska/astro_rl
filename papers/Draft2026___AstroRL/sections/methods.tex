@@ -1,0 +1,83 @@
+\section{Materials and Methods}
+\subsection{Prediction learning and a detached motor policy}
+AstroRL combines a recurrent spiking representation, an action-conditioned transition predictor, a familiarity memory, and a separate spiking motor circuit (Fig.~\ref{fig:model}). The prediction system learns throughout interaction in both experimental groups. In the no-RL group the motor readout remains at its zero initialization. In the RL group reward updates the motor readout while the recurrent representation continues to learn only from prediction error. There is no reward gradient into the recurrent network.
+
+Let $o_t$ denote the observed position and $z_t$ the filtered activity of the recurrent network. A fixed transformation $\varphi$ centers and scales this activity for the motor readout. Excitation of action channel $a$ is
+\begin{equation}
+ I^{\mathrm E}_a(t)=I_0+A_I\tanh\!\left((W_{\rm actor}\,\operatorname{sg}[\varphi(z_t)]+b)_a\right),
+ \label{eq:actor}
+\end{equation}
+where $\operatorname{sg}$ preserves its argument in the forward pass and stops its gradient. The matrix $W_{\rm actor}$ and bias $b$ are learned only in the RL group. Detachment separates the two parameter-update paths; it does not freeze the recurrent weights or prevent the policy from changing the transitions available for prediction learning. The motor circuit has direct action channels without a hidden motor layer. Architectural dimensions, initialization, and numerical settings are given in Appendix~\ref{app:protocol}.
+
+
+
+\subsection{Writing actual experience and querying candidate outcomes}
+Memory addresses are fixed, overlapping spatial receptive fields. For feature $i$, a Gaussian response to the current observation is retained among the most active fields and normalized to obtain $u_i(o_t)$. Neither the receptive fields nor the controller receive a wall map, goal coordinate, shortest-path distance, or visited-cell table.
+
+The astrocytic bank uses a glutamate variable $g_i$ and a reduced calcium variable $C_i$. Feature-dependent Poisson release drives
+\begin{align}
+ \dot g_i&=-g_i/\tau_g+q_g\sum_k\delta(s-s_{ik}),\\
+ \ddot C_i+\frac{2}{\tau_C}\dot C_i+\frac{C_i}{\tau_C^2}
+ &=\frac{A_C}{\tau_C^2}\,\mathbf1\{g_i>g_{\rm th}\}.
+\end{align}
+The calcium-derived memory is
+\begin{equation}
+ m_i=\operatorname{clip}\!\left(\frac{C_i-\theta_C}{A_C-\theta_C},0,1\right).
+\end{equation}
+This reduced glutamate--calcium motif follows the navigation model of Tsybina and colleagues \cite{tsybina2026}; its distributed feature addressing and learned candidate queries are specific to the present controller. The numerical implementation advances the discrete release process and integrates constant-forcing calcium intervals analytically.
+
+Before selecting an action, the current observation writes to memory. The predictor evaluates each candidate action using the current recurrent representation:
+\begin{equation}
+ (\widehat u^{(a)}_{t+1},\widehat o^{(a)}_{t+1})=P_\omega(z_t,a).
+\end{equation}
+The feature prediction $\widehat u^{(a)}_{t+1}$ is a normalized distribution. Its overlap with the current memory gives familiarity,
+\begin{equation}
+ f_a=\frac{\sum_i\widehat u_i^{(a)}m_i}{\sum_i\widehat u_i^{(a)}},\qquad
+ h_a=\operatorname{clip}\!\left(\frac{f_a-\min_b f_b}{c_f},0,h_{\max}\right).
+ \label{eq:familiarity}
+\end{equation}
+Predicted outcomes do not write to the bank. The relative gate compares actions at the current decision and leaves a least-familiar candidate unsuppressed. It is a soft bias rather than a legal-action mask or a hard prohibition on revisits.
+
+\subsection{Inhibitory recruitment and action selection}
+Familiarity changes the threshold of an action-specific inhibitory LIF neuron,
+\begin{equation}
+ \vartheta^{\mathrm I}_a=\frac{\vartheta^{\mathrm I}_0}{1+\kappa_h h_a}.
+\end{equation}
+Inhibitory spikes accumulate in a decaying state $q_a$ and subtract a scaled current from the corresponding motor LIF neuron. This is a simplified current-inhibition circuit. The model does not implement a biophysical conductance-based synapse or inhibition inside the ALIF network. Motor spike counts $n_a$ after a warmup interval define
+\begin{equation}
+ \pi(a\mid z_t,m_t)=
+ \frac{\exp[n_a/(L_{\rm eff}\mathcal T)]}{\sum_b\exp[n_b/(L_{\rm eff}\mathcal T)]}.
+\end{equation}
+Here $L_{\rm eff}=48$ is the number of decoded motor ticks and $\mathcal T$ is the selected decoder temperature. An action is sampled from this distribution. Motor membrane and eligibility states reset for each decision; recurrent and memory states persist within an episode and reset between episodes. Recurrent, motor, and calcium simulation windows are separate computational clocks.
+
+\subsection{Prediction updates and local eligibility}
+The recurrent network contains regular and adaptive LIF neurons. Symmetric e-prop combines forward synaptic eligibility factors with a prediction learning signal \cite{bellec2020}. The predictor learns three targets: the next spatial feature distribution, next coordinates, and a reconstruction of current coordinates. Its loss is
+\begin{equation}
+ \mathcal L_{\rm pred}=\lambda_u\operatorname{CE}(\overline u_{t+1},\widehat u_{t+1})
+ +\lambda_o\operatorname{MSE}(\widehat o_{t+1},o_{t+1})
+ +\lambda_d\operatorname{MSE}(\widehat o_t,o_t),
+\end{equation}
+where $\overline u$ is normalized to sum to one. Each term is averaged over the current episode. The signal $\partial\mathcal L_{\rm pred}/\partial z_{t,j}$ is combined with the stored, filtered local eligibility $\overline e_{ij,t}$ to assemble a recurrent update proportional to
+\begin{equation}
+ \widetilde{\partial}_{\theta_{ij}}\mathcal L_{\rm pred}
+ =\sum_t\frac{\partial\mathcal L_{\rm pred}}{\partial z_{t,j}}\,\overline e_{ij,t}.
+\end{equation}
+The non-spiking prediction heads use ordinary differentiation. One update per episode changes the recurrent weights; additional prediction updates use stored observations and cached representations to refit the heads alone. Replay does not add environment transitions, update the actor, or apply a reward signal to the recurrent network.
+
+\subsection{Reward-based motor learning}
+Motor learning uses an episodic REINFORCE objective \cite{williams1992}. Define $G_t=\sum_{k=t}^{T-1}\gamma^{k-t}r_k$ and a time-indexed baseline $\overline G_t$ estimated from preceding episodes. The motor update uses the surrogate ascent direction
+\begin{equation}
+ \widetilde\nabla\mathcal J=
+ \sum_{t=0}^{T-1}\frac{\gamma^t}{H}
+ \left[(G_t-\overline G_t)\widetilde\nabla\log\pi(a_t)
+ +\beta_{\mathcal H}\widetilde\nabla\mathcal H(\pi_t)\right].
+ \label{eq:rl}
+\end{equation}
+The normalization uses the maximum episode horizon $H=50$. The forward policy uses actual hard motor spikes. Its derivative uses local forward sensitivities, with hard reset and refractory state detached. Thus Eq.~\ref{eq:rl} is a surrogate update, not an assertion that the hard-spike policy score is unbiased. Actor weights remain fixed within the episode; the actor and then the prediction system are updated after it. The baseline is updated after constructing the actor direction. There is no learned critic.
+
+\subsection{Comparison and evaluation design}
+The experiments compare No Astro, AstroRL, a neuronal-trace memory replacement, a feedforward MLP control, and a uniform random walk. The spiking variants share architectural dimensions. The MLP uses local derivatives and fixed direct feedback in its hidden layers, in the spirit of direct feedback alignment \cite{nokland2016}; its algorithm and parameter count differ from recurrent e-prop. The trace dynamics, MLP details, tasks, reward, training budgets, and all selected settings are specified in Appendix~\ref{app:protocol}.
+
+Each configuration is selected separately for its model, learning group, and map using development seeds. New seeds provide final replication on those same fixed maps. Between-model contrasts therefore compare configured learning systems. They do not isolate a single memory parameter, establish equal computational cost, or test transfer to unseen maps.
+
+Final evaluation freezes every learned parameter and the reward baseline. Memory ON and OFF use the same checkpoint, starts, and action uniforms. ON advances memory from real observations; OFF bypasses the bank and its motor influence. These rollouts can diverge after the first changed action. A separate common-input probe evaluates transition prediction on identical forced-random contexts, independently of each policy's evaluation trajectories. Seed-level uncertainty, multiplicity, and the limits of the available numerical evidence are described in Appendix~\ref{app:stats}.

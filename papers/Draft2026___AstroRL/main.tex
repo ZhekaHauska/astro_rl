@@ -1,0 +1,50 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,tabularx,longtable,array}
+\usepackage{graphicx,microtype,placeins}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={AstroRL: prediction-guided familiarity memory in a recurrent spiking navigation controller},pdfauthor={Aleksandr Panov}}
+\setlength{\emergencystretch}{3em}
+\renewcommand{\topfraction}{.94}
+\renewcommand{\textfraction}{.05}
+\renewcommand{\floatpagefraction}{.75}
+\title{AstroRL: prediction-guided familiarity memory in a recurrent spiking navigation controller}
+\author{Nikita Bainaev, Evgenii Dzhivelikian, Aleksandr Panov}
+\date{Manuscript draft, 23 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+\clearpage
+\input{sections/visual_abstract}
+\clearpage
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/materials_and_methods}
+\FloatBarrier
+\input{sections/results}
+\FloatBarrier
+\input{sections/discussion}
+\input{sections/conclusion}
+\clearpage
+\begingroup\raggedright
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+\endgroup
+\clearpage\appendix
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\theHfigure}{supplement.\arabic{figure}}
+\renewcommand{\theHtable}{supplement.\arabic{table}}
+\input{sections/appendix}
+\FloatBarrier
+\input{sections/supplementary_figures}
+\end{document}

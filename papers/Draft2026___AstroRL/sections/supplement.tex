@@ -1,0 +1,84 @@
+\section{Supplementary figures}\label{app:figures}
+These displays cover exposure, prediction distribution, navigation, memory intervention, spatial behavior, and configuration selection. Correlated variants and repeated occupancy views are omitted from the manuscript; their original SVG files remain in the source archive.
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/common_probe_learning_prediction_balanced_accuracy.pdf}
+\caption{\textbf{Prediction learning on shared contexts.} The probe is measured at initialization and every 100 episodes. Each checkpoint uses 512 forced-random transitions per seed; these progress probes are distinct from the final probe. Curves join measured checkpoint means without smoothing. Shading is the source 95\% bootstrap interval over ten seeds (5000 draws). The 100-episode spacing does not locate the exact early learning time.}
+\label{fig:supp_common_probe_learning_prediction_balanced_accuracy}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/training_coverage_actions.pdf}
+\caption{\textbf{Exploration against actual action exposure.} The two rows distinguish no RL and RL. Each seed curve is smoothed with a trailing 20-episode mean, then interpolated linearly to 100 action-count positions within observed support. No extrapolation is performed. Each model stops at its shortest seed budget, so right endpoints differ. Shading is pointwise seed-bootstrap uncertainty (2000 draws). Coincident uniform controls are expected.}
+\label{fig:supp_training_coverage_actions}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/training_reward01_actions.pdf}
+\caption{\textbf{Reward learning against actual action exposure.} Training returns are smoothed over the trailing 20 episodes within seed and interpolated as in the preceding figure. Means and pointwise 95\% seed-bootstrap bands use ten seeds and 2000 draws. These are training-policy observations, not frozen checkpoint success estimates. The no-RL row is a diagnostic return series. Equal episode counts do not imply equal transition exposure.}
+\label{fig:supp_training_reward01_actions}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/evaluation_training_steps.pdf}
+\caption{\textbf{Realized transition budgets.} Total attempted training actions in the 600 episodes, shown per seed and as means with source 95\% bootstrap intervals. Early goal termination reduces exposure. ON/OFF labels repeat the same training budget of a checkpoint rather than describing additional training. Runtime and optimizer-step logs are not present in this attachment.}
+\label{fig:supp_evaluation_training_steps}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/evaluation_path_efficiency.pdf}
+\caption{\textbf{Goal-adjusted path efficiency.} The statistic is success times shortest-path distance divided by actual actions; failures contribute zero. It accompanies the raw distance/action ratio because that ratio stays positive on failures. Ten seed means, 100 episodes per seed and mode; source marginal 95\% seed-bootstrap intervals. This distinguishes reliable completion from a favorable ratio on unsuccessful trajectories.}
+\label{fig:supp_evaluation_path_efficiency}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/evaluation_success.pdf}
+\caption{\textbf{Goal completion as an auxiliary outcome.} Success is the fraction of 100 evaluation episodes reaching the fixed goal within 50 actions. Points and marginal 95\% intervals summarize ten seeds. Filled memory markers are ON and open markers OFF at identical trained weights. Success complements the primary reward and route measures; it is not a replacement for them.}
+\label{fig:supp_evaluation_success}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/evaluation_backtracking_rate.pdf}
+\caption{\textbf{Immediate reversals during frozen evaluation.} Backtracking is an immediate return along a successful move, divided by the number of successful moves. It is not divided by every attempted action. Ten seed means over 100 episodes per mode and source 95\% intervals. A low reversal rate must be interpreted alongside collisions and goal completion; it does not guarantee good navigation.}
+\label{fig:supp_evaluation_backtracking_rate}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/evaluation_collision_rate.pdf}
+\caption{\textbf{Blocked-action attempts during frozen evaluation.} Collision rate is blocked attempts divided by actual actions. Uniform random walk samples all four directions, including blocked ones; no legal-action mask is supplied to a learner. Source means and 95\% bootstrap intervals use ten seeds, with 100 episodes within each seed. Memory OFF can change both visited states and collision frequency.}
+\label{fig:supp_evaluation_collision_rate}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/common_probe_prediction_move_accuracy.pdf}
+\caption{\textbf{Common-input accuracy on genuine moves.} The common probe contains 512 shared forced-random transitions per seed. Only transitions to a different cell enter this stratum. Ten seed values, means, and source 95\% bootstrap intervals. This avoids counting successful prediction of a collision as evidence for learning displacement.}
+\label{fig:supp_common_probe_prediction_move_accuracy}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/common_probe_prediction_collision_accuracy.pdf}
+\caption{\textbf{Common-input accuracy on collisions.} The same probe is restricted to actions that leave the agent in its current cell. Ten seed values, means, and source 95\% bootstrap intervals. Together with the move stratum, it defines balanced accuracy; neither stratum alone measures complete transition quality.}
+\label{fig:supp_common_probe_prediction_collision_accuracy}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/evaluation_prediction_accuracy.pdf}
+\caption{\textbf{Prediction along each evaluated policy trajectory.} Next-cell accuracy is measured on actual policy-selected transitions, with ten seed means and source 95\% intervals over 100 episodes per mode. ON and OFF can encounter different states even at identical learned weights. High accuracy here should be checked against the common-input probe in the main text, not interpreted as a policy-independent test.}
+\label{fig:supp_evaluation_prediction_accuracy}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/memory_ablation_coverage.pdf}
+\caption{\textbf{Paired effect of memory use on coverage.} Mean ON-minus-OFF differences and source paired 95\% intervals across ten seeds, with matched 100-episode starts and action uniforms. These are inference interventions. The policy can follow different trajectories, and early goal arrival can shorten exploration. The four maps remain fixed rather than being sampled as a population.}
+\label{fig:supp_memory_ablation_coverage}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/exploration_navigation_tradeoff.pdf}
+\caption{\textbf{Coverage and reward on the same final evaluation.} Each small point is a seed mean and each large point a group centroid. Memory is ON for the active memory systems. High reward can accompany low coverage when a learned route reaches the goal quickly. This descriptive association does not identify exploration as the mediator of reward improvement.}
+\label{fig:supp_exploration_navigation_tradeoff}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/spatial_rl_eval_arrival_on.pdf}
+\caption{\textbf{Where RL evaluation trajectories arrive.} Post-action arrival counts include terminal goal visits. Counts are normalized within each seed before averaging ten seed maps; longer trajectories are not weighted as additional replicas. Gray cells are walls and stars are goals. Color limits are shared across compared conditions within each map; maps have different limits. No spatial interpolation is applied.}
+\label{fig:supp_spatial_rl_eval_arrival_on}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/spatial_rl_probe.pdf}
+\caption{\textbf{Spatial structure of common-probe errors.} Each free-cell value is a within-seed fraction of incorrect next-cell predictions on the shared forced-random contexts, averaged across available seeds. Gray denotes walls; white free cells lack probe support; zero error remains a plotted data color. All panels use the 0--1 error scale. The star locates the goal for orientation, not as a learner input.}
+\label{fig:supp_spatial_rl_probe}\end{figure}
+
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth,height=.73\textheight,keepaspectratio]{figures/hyperparameter_validation.pdf}
+\caption{\textbf{The last configuration-selection stage.} The final two candidates for each model, group, and map use five validation seeds at 600 episodes. Filled markers denote the candidate selected by mean minus 0.25 sample SD. Bars show SD, not confidence intervals. The objectives differ between groups and for random walk, so heights are comparable only within the relevant model-selection pair. Final seeds do not select configurations.}
+\label{fig:supp_hyperparameter_validation}\end{figure}
+
+\FloatBarrier

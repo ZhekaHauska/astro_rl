@@ -1,0 +1,28 @@
+\begingroup\footnotesize\setlength{\tabcolsep}{3.5pt}\begin{longtable}{@{}lllllll@{}}
+\caption{Actor schedules for the 16 learned RL policies. Learning rate and entropy coefficient interpolate linearly from initial to final values over fraction $f$ of the episode budget, then remain fixed. The same fraction controls spiking decoder temperature. Random walk and no-RL policies receive no actor update.}\label{tab:actor_settings}\\
+\toprule
+Map & Model & $\eta_{A,0}$ & $\eta_{A,1}$ & $\beta_0$ & $\beta_1$ & $f$\\\midrule
+\endfirsthead
+\multicolumn{7}{l}{\textit{Table \thetable\ continued}}\\
+\toprule
+Map & Model & $\eta_{A,0}$ & $\eta_{A,1}$ & $\beta_0$ & $\beta_1$ & $f$\\\midrule
+\endhead
+\midrule\multicolumn{7}{r}{\textit{Continued on next page}}\\\endfoot
+\bottomrule\endlastfoot
+Open & MLP & 0.006 & 0.0006 & 0.005 & 0.0005 & 0.5\\
+Open & NoA & 0.01 & 0.001 & 0.03 & 0.0001 & 0.5\\
+Open & Ca & 0.006 & 0.0006 & 0.03 & 0.0001 & 0.667\\
+Open & Trace & 0.01 & 0.001 & 0.005 & 0.002 & 1\\
+Obstacles & MLP & 0.006 & 0.0006 & 0.05 & 0.002 & 1\\
+Obstacles & NoA & 0.01 & 0.001 & 0.03 & 0.0005 & 1\\
+Obstacles & Ca & 0.006 & 0.0006 & 0.005 & 0.0001 & 0.667\\
+Obstacles & Trace & 0.006 & 0.0006 & 0.05 & 0.0005 & 0.667\\
+Rooms & MLP & 0.006 & 0.0006 & 0.005 & 0.0001 & 1\\
+Rooms & NoA & 0.006 & 0.0006 & 0.03 & 0.0001 & 0.667\\
+Rooms & Ca & 0.006 & 0.0006 & 0.03 & 0.0001 & 0.667\\
+Rooms & Trace & 0.006 & 0.0006 & 0.03 & 0.0001 & 0.667\\
+Branching & MLP & 0.006 & 0.0006 & 0.05 & 0.002 & 0.5\\
+Branching & NoA & 0.0005 & $5\!\times10^{-5}$ & 0.03 & 0.0005 & 1\\
+Branching & Ca & 0.0015 & 0.00015 & 0.05 & 0.0005 & 1\\
+Branching & Trace & 0.003 & 0.0003 & 0.005 & 0.0001 & 0.5\\
+\end{longtable}\endgroup

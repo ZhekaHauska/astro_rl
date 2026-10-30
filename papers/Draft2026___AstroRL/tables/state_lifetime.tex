@@ -1,0 +1,11 @@
+\begin{table}[htbp]\centering\small
+\caption{\textbf{State reset and persistence.} Evaluation preserves trained parameters and disables all learning. Memory OFF bypasses the bank.}\label{tab:state}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{.25\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X}\toprule
+Component & Within an episode & At the next episode\\\midrule
+Recurrent core & Membrane, adaptation, filtered spikes, encoder phase, and synaptic eligibility advance across observations. & These dynamic states reset; learned input and recurrent weights persist.\\
+Calcium memory & Glutamate, calcium, and its dynamical derivative advance when the bank is enabled. & A new bank starts with zero dynamic state.\\
+Trace memory & Feature traces accumulate and decay when the bank is enabled. & A new bank starts with zero traces.\\
+Motor circuit & Membrane, refractory, inhibitory, and eligibility states reset before each action decision. & The same decision-level reset applies; learned readout weights persist.\\
+Training records & The actor baseline, Adam state, and prediction replay records are used for between-episode learning. & They persist during training; evaluation performs no updates.\\\bottomrule
+\end{tabularx}
+\end{table}

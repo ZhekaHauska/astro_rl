@@ -1,0 +1,36 @@
+\begingroup\footnotesize\setlength{\tabcolsep}{3.5pt}\begin{longtable}{@{}llllllll@{}}
+\caption{Fixed motor settings for the 24 spiking configurations. Core and predictor dimensions are shared; calibration is selected independently. $I_0$ is base excitation, $A_I$ its modulation amplitude, $\mathcal T$ decoder temperature, and $\chi$ inhibitory-current scaling. No-RL keeps the initial temperature, so its unused endpoint is omitted. No Astro has no effective inhibition.}\label{tab:motor_settings}\\
+\toprule
+G & Map & Model & $I_0$ & $A_I$ & $\mathcal T_0$ & $\mathcal T_1$ & $\chi$\\\midrule
+\endfirsthead
+\multicolumn{8}{l}{\textit{Table \thetable\ continued}}\\
+\toprule
+G & Map & Model & $I_0$ & $A_I$ & $\mathcal T_0$ & $\mathcal T_1$ & $\chi$\\\midrule
+\endhead
+\midrule\multicolumn{8}{r}{\textit{Continued on next page}}\\\endfoot
+\bottomrule\endlastfoot
+N & Open & NoA & 1.45 & 1 & 0.03 & -- & --\\
+N & Open & Ca & 1.7 & 1 & 0.02 & -- & 0.25\\
+N & Open & Trace & 1.7 & 1 & 0.02 & -- & 0.1\\
+N & Obstacles & NoA & 1.45 & 1 & 0.03 & -- & --\\
+N & Obstacles & Ca & 1.23 & 0.75 & 0.02 & -- & 1\\
+N & Obstacles & Trace & 1.23 & 1 & 0.02 & -- & 1\\
+N & Rooms & NoA & 1.23 & 1 & 0.05 & -- & --\\
+N & Rooms & Ca & 1.23 & 1 & 0.03 & -- & 0.5\\
+N & Rooms & Trace & 1.45 & 0.75 & 0.02 & -- & 0.5\\
+N & Branching & NoA & 1.23 & 0.75 & 0.03 & -- & --\\
+N & Branching & Ca & 1.45 & 1 & 0.02 & -- & 1\\
+N & Branching & Trace & 1.45 & 0.75 & 0.03 & -- & 1\\
+R & Open & NoA & 1.45 & 1 & 0.05 & 0.003 & --\\
+R & Open & Ca & 1.45 & 1 & 0.03 & 0.003 & 0.25\\
+R & Open & Trace & 1.7 & 0.75 & 0.05 & 0.0075 & 0.1\\
+R & Obstacles & NoA & 1.45 & 0.75 & 0.05 & 0.003 & --\\
+R & Obstacles & Ca & 1.45 & 1 & 0.05 & 0.002 & 1\\
+R & Obstacles & Trace & 1.23 & 1 & 0.05 & 0.0075 & 1\\
+R & Rooms & NoA & 1.45 & 1 & 0.03 & 0.0075 & --\\
+R & Rooms & Ca & 1.45 & 1 & 0.03 & 0.0075 & 0.25\\
+R & Rooms & Trace & 1.45 & 1 & 0.03 & 0.0075 & 0.25\\
+R & Branching & NoA & 1.45 & 0.75 & 0.03 & 0.015 & --\\
+R & Branching & Ca & 1.7 & 0.75 & 0.05 & 0.002 & 1\\
+R & Branching & Trace & 1.23 & 1 & 0.03 & 0.002 & 1\\
+\end{longtable}\endgroup
