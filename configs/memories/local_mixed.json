@@ -1,0 +1,4 @@
+{
+  "extends": "memories/local_equal.json",
+  "heterogeneous": true
+}

@@ -1,0 +1,24 @@
+{
+  "name": "mdp_three_goal_factorial",
+  "environment": "environments/mdp_three_goal.json",
+  "map_set": "maps/checkpoints.json",
+  "models": {
+    "full_mixed_pool": {
+      "extends": "models/full_mixed_pool.json",
+      "architecture": "architectures/rsnn100_context.json"
+    },
+    "full_mixed_single": {
+      "extends": "models/full_mixed_single.json",
+      "architecture": "architectures/rsnn100_context.json"
+    },
+    "local_equal_pool": {
+      "extends": "models/local_equal_pool.json",
+      "architecture": "architectures/rsnn100_context.json"
+    },
+    "local_equal_single": {
+      "extends": "models/local_equal_single.json",
+      "architecture": "architectures/rsnn100_context.json"
+    }
+  },
+  "protocol": "protocols/mdp_three_goal.json"
+}

@@ -1,0 +1,8 @@
+{
+  "extends": "protocols/mdp_single_goal.json",
+  "episodes": 300,
+  "groups": [
+    "rl"
+  ],
+  "seed_scheme": "three_goal_20261030"
+}

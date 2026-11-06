@@ -1,0 +1,21 @@
+{
+  "name": "mdp_dense_familiarity_ablation",
+  "environment": "environments/mdp_single_goal.json",
+  "map_set": "maps/mdp_pool.json",
+  "models": {
+    "local_equal_pool": "models/local_equal_pool.json",
+    "whole": "models/whole.json",
+    "rff": "models/rff.json"
+  },
+  "protocol": {
+    "extends": "protocols/mdp_single_goal.json",
+    "groups": [
+      "rl"
+    ],
+    "evaluation_modes": [
+      "learned",
+      "off",
+      "confidence_off"
+    ]
+  }
+}

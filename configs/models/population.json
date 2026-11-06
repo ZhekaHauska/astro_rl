@@ -1,0 +1,13 @@
+{
+  "learner": "population",
+  "kind": "astro",
+  "architecture": "architectures/rsnn100_rbf.json",
+  "memory": "memories/local_equal.json",
+  "memory_base": "memories/components.json",
+  "motor": "motors/pool.json",
+  "parameters": "parameters/local_pool.json",
+  "parameter_match": {
+    "variant": "homogeneous"
+  },
+  "parameter_overrides": {}
+}

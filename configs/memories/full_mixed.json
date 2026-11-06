@@ -1,0 +1,5 @@
+{
+  "extends": "memories/local_equal.json",
+  "connectivity": "full",
+  "heterogeneous": true
+}

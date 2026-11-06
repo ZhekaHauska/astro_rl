@@ -1,0 +1,8 @@
+{
+  "backend": "calcium",
+  "cells": 5,
+  "connectivity": "local",
+  "overlap": 1,
+  "heterogeneous": false,
+  "activity_code": "excess"
+}

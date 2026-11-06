@@ -1,4 +1,8 @@
-"""Episode budgets, training trials, paired frozen evaluation and scalar metrics."""
+"""Legacy four-map article protocol (explicit --legacy entry point).
+
+It intentionally preserves the published 24-channel input-code memory. Current
+RSNN-activity MDP models use rollouts.py and checkpoint_rollout.py instead.
+"""
 
 import gzip, json, time
 import numpy as np
@@ -25,9 +29,7 @@ def make_learner(kind, rl, seed, hp):
 
 
 def schedule(spec, seed, count, split):
-    free = np.asarray(
-        [p for p in sorted(map(tuple, spec["free"])) if p != max(map(tuple, spec["free"]))]
-    )
+    free = np.asarray([p for p in sorted(map(tuple, spec["free"])) if p != max(map(tuple, spec["free"]))])
     rng = np.random.default_rng(np.random.SeedSequence([20261023, seed, split, 917]))
     return free[rng.integers(len(free), size=count)]
 
@@ -37,11 +39,7 @@ def action_seed(seed, episode, split):
 
 
 def summarize(rows):
-    keys = [
-        k
-        for k, v in rows[0].items()
-        if isinstance(v, (int, float, np.number)) and k not in ("episode",)
-    ]
+    keys = [k for k, v in rows[0].items() if isinstance(v, (int, float, np.number)) and k not in ("episode",)]
     out = {k: float(np.mean([r[k] for r in rows if r.get(k) is not None])) for k in keys}
     # A missing move/collision stratum is retained as missing, never replaced by 0.
     for key in ("prediction_move_accuracy", "prediction_collision_accuracy"):
@@ -169,12 +167,8 @@ def trajectory(learner, spec, start, seed, training=False, memory_on=True):
         revisit_rate=revisits / T,
         state_action_coverage=len(pairs) / (4 * len(free)),
         spatial_entropy=float(-np.sum(q * np.log(q)) / np.log(len(free))),
-        loop2_rate=float(np.mean([path[k] == path[k - 2] for k in range(2, len(path))]))
-        if T >= 2
-        else 0.0,
-        loop4_rate=float(np.mean([path[k] == path[k - 4] for k in range(4, len(path))]))
-        if T >= 4
-        else 0.0,
+        loop2_rate=float(np.mean([path[k] == path[k - 2] for k in range(2, len(path))])) if T >= 2 else 0.0,
+        loop4_rate=float(np.mean([path[k] == path[k - 4] for k in range(4, len(path))])) if T >= 4 else 0.0,
         entropy=float(np.mean(entropies)),
         mean_gate=float(np.mean(gates)),
         motor_silent_fraction=float(np.mean(silent)),
@@ -275,9 +269,7 @@ def evaluate(learner, spec, seed, count=100, split=8):
         rows = []
         totals = None
         for i, start in enumerate(starts):
-            row, _, stats, _ = trajectory(
-                learner, spec, start, action_seed(seed, i, split), memory_on=mode == "on"
-            )
+            row, _, stats, _ = trajectory(learner, spec, start, action_seed(seed, i, split), memory_on=mode == "on")
             row.update(episode=i + 1)
             rows.append(row)
             if totals is None:
@@ -378,15 +370,11 @@ def case(task):
         development = []
         first = 0
         occupancy = np.zeros((6, spec["size"], spec["size"]), np.int64)
-        initial, _ = prediction_probe(
-            learner, spec, action_seed(seed, 0, 5), contexts=32 if stage != "final" else 128
-        )
+        initial, _ = prediction_probe(learner, spec, action_seed(seed, 0, 5), contexts=32 if stage != "final" else 128)
         development.append(dict(episode=0, training_steps=0, **initial))
     for ep in range(first + 1, episodes + 1):
         learner.schedule(ep, episodes)
-        row, records, stats, _ = trajectory(
-            learner, spec, starts[ep - 1], action_seed(seed, ep, 1), True
-        )
+        row, records, stats, _ = trajectory(learner, spec, starts[ep - 1], action_seed(seed, ep, 1), True)
         row.update(learner.update(records))
         row.update(episode=ep)
         row["actor_learning_rate"] = learner.actor_lr

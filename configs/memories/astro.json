@@ -1,0 +1,6 @@
+{
+  "extends": "memories/local_equal.json",
+  "backend": "astro",
+  "cells": 1,
+  "connectivity": "full"
+}

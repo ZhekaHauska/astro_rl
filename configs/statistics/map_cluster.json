@@ -1,0 +1,6 @@
+{
+  "unit": "map_then_seed",
+  "bootstrap_draws": 1000,
+  "seed": 20261104,
+  "interval": 0.95
+}

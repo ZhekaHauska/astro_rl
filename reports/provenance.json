@@ -1,0 +1,140 @@
+{
+  "date": "2026-11-07",
+  "new_training": false,
+  "reports": [
+    {
+      "file": "mdp_map_pool.pdf",
+      "title": "MDP: навигация на множестве карт",
+      "pages": 11,
+      "bytes": 3678922,
+      "sha256": "6483eb089fc26cf09f1c694d5343b6db32a7aa548f40d10e0e49d654f0362f05",
+      "description": "2880 historical final fits; 60 maps; original eight-model benchmark.",
+      "source_files": [
+        "AstroRL_experiment/mdp_map_pool_20261030/results/figures/evaluation_reward01.pdf",
+        "AstroRL_experiment/mdp_map_pool_20261030/results/figures/evaluation_path_efficiency.pdf",
+        "AstroRL_experiment/mdp_map_pool_20261030/results/figures/evaluation_coverage.pdf",
+        "AstroRL_experiment/mdp_map_pool_20261030/results/figures/training_reward01.pdf",
+        "AstroRL_experiment/mdp_map_pool_20261030/results/figures/training_path_efficiency.pdf",
+        "AstroRL_experiment/mdp_map_pool_20261030/results/figures/training_coverage.pdf",
+        "AstroRL_experiment/reports/astro_studies_20261103/figures_auc/maps_auc_reward.pdf",
+        "AstroRL_experiment/reports/astro_studies_20261103/figures_auc/maps_auc_steps.pdf"
+      ]
+    },
+    {
+      "file": "tau_gate_sweep.pdf",
+      "title": "AstroRL: сетка tau × gate gain",
+      "pages": 11,
+      "bytes": 2872474,
+      "sha256": "919aa4b0fed6ab775084d400312eca16a02f0f3a7b50f1c632d678fd58b4b1f5",
+      "description": "2790 historical fits, six tau by five gain values, six obstacle difficulty levels.",
+      "source_files": [
+        "AstroRL_experiment/astro_memory_grid_20261031/results/figures/surface_reward01.pdf",
+        "AstroRL_experiment/astro_memory_grid_20261031/results/figures/surface_path_efficiency.pdf",
+        "AstroRL_experiment/astro_memory_grid_20261031/results/figures/surface_coverage.pdf",
+        "AstroRL_experiment/astro_memory_grid_20261031/results/figures/baseline_difference_reward01.pdf",
+        "AstroRL_experiment/astro_memory_grid_20261031/results/figures/difficulty_tau_gain1_2_reward01.pdf",
+        "AstroRL_experiment/reports/astro_studies_20261103/figures_auc/memory_auc_reward.pdf",
+        "AstroRL_experiment/reports/astro_studies_20261103/figures_auc/memory_auc_steps.pdf",
+        "AstroRL_experiment/reports/astro_studies_20261103/figures_auc/memory_training_steps_gain1.pdf",
+        "AstroRL_experiment/reports/astro_studies_20261103/figures_auc/memory_training_steps_gain2.pdf"
+      ]
+    },
+    {
+      "file": "mdp_adaptive_astrocytes.pdf",
+      "title": "MDP: адаптивное смешивание астроцитов",
+      "pages": 10,
+      "bytes": 4663744,
+      "sha256": "dc0648a7e7f75c1a8cf363d09c24b01e4fc1a86846cfdba1a2fe299355aeba8f",
+      "description": "Historical adaptive_local_astro_20261103; protocol and original vector figure compendium; no per-run reanalysis.",
+      "source_files": [
+        "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/evaluation_reward01.pdf",
+        "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/evaluation_path_efficiency.pdf",
+        "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/evaluation_coverage.pdf",
+        "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/training_reward01.pdf",
+        "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/training_path_efficiency.pdf",
+        "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/training_coverage.pdf",
+        "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/auc_reward01.pdf",
+        "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/auc_steps.pdf"
+      ]
+    },
+    {
+      "file": "mdp_inhibitory_pool.pdf",
+      "title": "MDP: локальная память и ингибирующий пул",
+      "pages": 10,
+      "bytes": 5445421,
+      "sha256": "31a6afd71ae6f5b0e3aa9e646e79d61249b01336731a67adf8c1c039123c99e2",
+      "description": "Historical local_inhibitory_pool_20261103; protocol and original vector figure compendium; no per-run reanalysis.",
+      "source_files": [
+        "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/evaluation_reward01.pdf",
+        "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/evaluation_path_efficiency.pdf",
+        "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/evaluation_coverage.pdf",
+        "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/training_reward01.pdf",
+        "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/training_path_efficiency.pdf",
+        "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/training_coverage.pdf",
+        "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/auc_reward01.pdf",
+        "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/auc_steps.pdf"
+      ]
+    },
+    {
+      "file": "mdp_three_goal_factorial.pdf",
+      "title": "Три цели: астроцитарная память и ингибирующие пулы",
+      "pages": 17,
+      "bytes": 5255794,
+      "sha256": "8dcdfb481bc31038109824056cd0782a9b0eab636cd20e73a003c6b25b646351",
+      "description": "Unchanged original 17-page validated report:1440 new factorial fits plus2880 baseline fits; formulas and training curves.",
+      "source_files": [
+        "output/pdf/three_goal_memory_factorial_report_RU.pdf"
+      ],
+      "unchanged_copy": true
+    }
+  ],
+  "source_sha256": {
+    "AstroRL_experiment/reports/astro_studies_20261103/aggregate_evidence.json": "2694f87f701f4a7a63956afda6a9e5ce5f98effb6107757bb0e25318a58ac66a",
+    "AstroRL_experiment/reports/astro_studies_20261103/auc_evidence.json": "647cbfe5614ef9b2793a9bf398b17e2272f28f363ce85790bd1c3baad77a6b03",
+    "AstroRL_experiment/reports/astro_studies_20261103/summary_metrics.csv": "1fa25a4fa0f7e42d97398dcf75ae4a3223005a62f75ad842ebf93c9392e57c11",
+    "AstroRL_experiment/reports/astro_studies_20261103/auc_metrics.csv": "574421d1b733f0f627fde92e0d98361d24c9cf6fdb2dc5f69710f1d02d3d89b9",
+    "AstroRL_experiment/reports/astro_studies_20261103/memory_surface.csv": "7498634dbbec5d72d2906060662c2af768599414326ae46821d37dbf23a26ee9",
+    "AstroRL_experiment/mdp_map_pool_20261030/results/figures/evaluation_reward01.pdf": "250d1400638f628a37e57c9d87125fd0706024230f71a573539e8e3ee7210082",
+    "AstroRL_experiment/mdp_map_pool_20261030/results/figures/evaluation_path_efficiency.pdf": "3574a3a32ad1bc1d2262b95d080a104874582ba500cd9c335a18cb81ecc168db",
+    "AstroRL_experiment/mdp_map_pool_20261030/results/figures/evaluation_coverage.pdf": "0dddfff1dfaf2b1d58c3ce9830770fb92fe4eb46b7da34ac604f6b5097807182",
+    "AstroRL_experiment/mdp_map_pool_20261030/results/figures/training_reward01.pdf": "79110e32f7f90f55849bc29c295b5471e8ab9751da10a40b50692dcd68efaa02",
+    "AstroRL_experiment/mdp_map_pool_20261030/results/figures/training_path_efficiency.pdf": "54707c1ceacfd3772155b376b5969329b11c3661ad6fa583c8248066c4c88c54",
+    "AstroRL_experiment/mdp_map_pool_20261030/results/figures/training_coverage.pdf": "be59adf87979a2e420225ffef0fb2014167f3cc934333034617ea80c11195bc2",
+    "AstroRL_experiment/reports/astro_studies_20261103/figures_auc/maps_auc_reward.pdf": "3455141e32099ccb888a53b5e8cac30e19f8004e1b6a61f9ca85b63f45841eaa",
+    "AstroRL_experiment/reports/astro_studies_20261103/figures_auc/maps_auc_steps.pdf": "659ada8639abf90dfea6e7606062bc2e8e72c469d6e46355736e4a36f2a014ed",
+    "AstroRL_experiment/astro_memory_grid_20261031/results/figures/surface_reward01.pdf": "168e8f612b25f67eaa9087dfb57cc5a8700961d1bda39b56515b654bf2d5b073",
+    "AstroRL_experiment/astro_memory_grid_20261031/results/figures/surface_path_efficiency.pdf": "154a00002de0426ca39741f0ea7d2043a2f014dd11b063236297523f39c66871",
+    "AstroRL_experiment/astro_memory_grid_20261031/results/figures/surface_coverage.pdf": "93b30e79dd222bd2729f42d8ce2632f05fb0d87dbf36b7e44c2409baa2f6717c",
+    "AstroRL_experiment/astro_memory_grid_20261031/results/figures/baseline_difference_reward01.pdf": "9b2a03a9cef0227d5b45caed05938de854b4d0de859e080abb80c4e7100dd4cb",
+    "AstroRL_experiment/astro_memory_grid_20261031/results/figures/difficulty_tau_gain1_2_reward01.pdf": "48dfc5d908f4bd7a71576eaed95af58f6e9c815b51829db5f893db4903f0b675",
+    "AstroRL_experiment/reports/astro_studies_20261103/figures_auc/memory_auc_reward.pdf": "ffaac2dda543c92d382b229e2f0b277137e634a219c94f8aa6345d6166336ff9",
+    "AstroRL_experiment/reports/astro_studies_20261103/figures_auc/memory_auc_steps.pdf": "fc3dc10c410bb2eb6b243be4f9fc5952af3dc489e3f83c2c12d8d62b39f5c20b",
+    "AstroRL_experiment/reports/astro_studies_20261103/figures_auc/memory_training_steps_gain1.pdf": "7d61851c1ed138cfa80c0216da826a290c82f2d33f0e4b7c72bb377db54528b0",
+    "AstroRL_experiment/reports/astro_studies_20261103/figures_auc/memory_training_steps_gain2.pdf": "01e77b9316907b6b02e78e24a2fd521e13550fdb75b2d324552b2e5b301c10a9",
+    "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/FIGURE_GUIDE_RU.md": "877ed3cca516cecc69342f1d282695e2d14285a19f459689ca714d7a254a0ccb",
+    "AstroRL_experiment/adaptive_local_astro_20261103/results/protocol.json": "4951bdaa97ba6a3169eaa6f93404255e2a437d9851615fe7df3b690a7b47183b",
+    "AstroRL_experiment/adaptive_local_astro_20261103/README_RU.md": "8abb6e49e09f502b15909da3bb9020ae06fa05f5818ff93c65a4776ab32bda2e",
+    "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/protocol_audit.json": "2e7fc713ffe6b90e54dedf69ab375cd1031fb7ac3d054e2db8fbfcc43e32605c",
+    "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/evaluation_reward01.pdf": "ee2e7f080ce8653e9bb9b1e106d0e4dd480e8a484234b27a3d0f169118fe63d0",
+    "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/evaluation_path_efficiency.pdf": "d8e071595dc242a1cee83222747b0666eaaec28bbd9ab1538060185ccf4d4ed4",
+    "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/evaluation_coverage.pdf": "d13fbd2f7728a211aa093b2ee2d2eb60c09928b7eb1f95951ef0ca899983c346",
+    "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/training_reward01.pdf": "4a64008e40a36e79cf59f899e1672398187a7e8bd6cb9f8caf23eb61eeff7cb2",
+    "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/training_path_efficiency.pdf": "898b9c92584bca4ae7e44875a927a42bb79fa9d0c245b529004f5f3b1ba1de89",
+    "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/training_coverage.pdf": "d8a8830ae139eb97f87b8a96ea8face9a234116e418cc3fe7abd8912460cbfd9",
+    "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/auc_reward01.pdf": "bede828ce733f4611916d219e0a9e34425c3ed786cdf4ccd4ef91863c94ec4e3",
+    "AstroRL_experiment/adaptive_local_astro_20261103/results/comparison_all_models/figures/auc_steps.pdf": "12ac2842f65fcdc325c7cffebd280a3dd161bfbd83fa35d468c1a5d0b87d6721",
+    "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/FIGURE_GUIDE_RU.md": "89bab7e27ca25b71bb7704d136dcd90b292977550964cd581fa72abef55cac9c",
+    "AstroRL_experiment/local_inhibitory_pool_20261103/results/protocol.json": "c8ec105c7afb84a0d819c146623ec6e58d1bf14bfcb1e21bd6163da4b5410fd5",
+    "AstroRL_experiment/local_inhibitory_pool_20261103/README_RU.md": "31e5bccd42b2cbb451820521126bf0aca3fea9bf1a6ff3730e320eb588742a00",
+    "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/evaluation_reward01.pdf": "3bcfc44fcffdcd61008314b57f9ee4c1213879ba43eda6e4efb82a586d053470",
+    "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/evaluation_path_efficiency.pdf": "578a28432c003ba0a763989812df5901199689aed95b6b30e2b19202884dcea9",
+    "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/evaluation_coverage.pdf": "b4c7085e7aee0003d18994fad469fc878a239e8a8524563888f65f0802b447cb",
+    "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/training_reward01.pdf": "67bf35a36ec68ec837c85bc599b249f1adfea61e3187adf2ef0c633decbcb33d",
+    "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/training_path_efficiency.pdf": "4a4f0e95590d784cd667d7a75172c4f66c155dbcdf240ef07bf7e7066cf78174",
+    "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/training_coverage.pdf": "d322148fc9b9298b5a39c6c32d70f54c8dad921fefbff309cf046f7fda4cf209",
+    "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/auc_reward01.pdf": "dc2527064d67ecbf3b90c12c35c87f00ff8b2e7e2f862ebfb43b1ed81cf9d114",
+    "AstroRL_experiment/local_inhibitory_pool_20261103/results/comparison_all_models/figures/auc_steps.pdf": "8bd7ae3dedb1135f940536e85e0edbf36ffdc11c437360b781eba8a572b650b7",
+    "output/pdf/three_goal_memory_factorial_report_RU.pdf": "8dcdfb481bc31038109824056cd0782a9b0eab636cd20e73a003c6b25b646351",
+    "AstroRL_experiment/three_goal_memory_factorial_20261104/results/comparison_all_models/report_validation.json": "53fd828f3c81f11c9e374f8b711a76e36413789678829222be51e7f52862d82a"
+  }
+}

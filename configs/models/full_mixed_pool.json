@@ -1,0 +1,5 @@
+{
+  "extends": "models/population.json",
+  "memory": "memories/full_mixed.json",
+  "motor": "motors/pool.json"
+}

@@ -23,7 +23,7 @@ class PredictionBackbone(nn.Module):
             )
             self.predictor = ObservationPredictor(
                 config.neurons,
-                config.input_channels,
+                config.observation_channels if config.input_encoding == "rbf" else config.input_channels,
                 actions=config.n_actions,
                 hidden=config.predictor_hidden,
                 feature_scale=config.predictor_scale,
@@ -33,21 +33,24 @@ class PredictionBackbone(nn.Module):
         core = FastBellecCore(self.rnn)
         rng = np.random.default_rng(8100000 + config.seed)
         values = []
-        for obs in rng.uniform(0, 1, (128, 2)).astype(np.float32):
+        for i, obs in enumerate(rng.uniform(0, 1, (128, 2)).astype(np.float32)):
+            self._calibration_context(i)
             values.append(core.observe(self.input_coder.encode(obs, None).numpy(), False, False)[0])
         values = np.asarray(values)
         self.center = torch.tensor(values.mean(0), dtype=torch.float32)
         self.scale = torch.tensor(1 / np.maximum(values.std(0), 0.002), dtype=torch.float32)
         self.core_optimizer = torch.optim.Adam(self.rnn.parameters(), lr=settings.core_lr)
-        self.prediction_optimizer = torch.optim.Adam(
-            self.predictor.parameters(), lr=settings.prediction_lr
-        )
+        self.prediction_optimizer = torch.optim.Adam(self.predictor.parameters(), lr=settings.prediction_lr)
 
     def _calibrate_current(self):
         net = self.rnn
         rng = np.random.default_rng(811113)
         samples = rng.uniform(0, 1, (128, 2)).astype(np.float32)
-        probabilities = np.asarray([self.input_coder.encode(obs, None).numpy() for obs in samples])
+        probabilities = []
+        for i, obs in enumerate(samples):
+            self._calibration_context(i)
+            probabilities.append(self.input_coder.encode(obs, None).numpy())
+        probabilities = np.asarray(probabilities)
         interval = 1000.0 / 10.0
         desired = net.threshold * (1 - net.alpha) / (1 - net.alpha**interval)
         bias = desired - probabilities.mean(0) @ net.win[:-1].detach().numpy()
@@ -57,3 +60,9 @@ class PredictionBackbone(nn.Module):
     def features(self, rates):
         values = (rates - self.center) * self.scale
         return values / torch.sqrt(values.square().sum(-1, keepdim=True) + 1e-8)
+
+    def _calibration_context(self, index):
+        if self.c.calibration_context:
+            self.input_coder.context = np.array(
+                [((index % 15 + 1) >> k) & 1 for k in range(self.c.context_channels)], dtype=np.float32
+            )

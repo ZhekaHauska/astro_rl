@@ -1,5 +1,34 @@
 # Архитектура
 
+## Актуальные MDP-модели
+
+```text
+configs/experiments/<series>.json
+  ├─ models/ → architecture + memory + motor + selected parameters
+  ├─ environments/ + maps/
+  └─ protocols/ → budget, seed, evaluation, statistics
+                  ↓ experiments/composition.py
+        experiments/models.py → объекты из src/astrorl
+                  ↓
+  modified.py + rollouts.py / checkpoint_rollout.py
+                  ↓
+  actual observation → RSNN → H(next actual RSNN activity)
+                       ├─ actual activity: write memory
+                       ├─ forecast: read-only familiarity query
+                       └─ detached motor features
+          familiarity →4/20 inhibitory LIF →4 Motor LIF
+```
+
+`src/astrorl/population.py` — одна модель для полного/локального входа, количества и перекрытия территорий, одинаковых/разных tau, single/pool. `adaptive.py` сохраняет отдельный механизм softmax-смешивания. `population_memory.py` содержит кальциевые/EMA-процессы и reliability; `dense_memory.py` — Whole/RFF. `pool_motor.py` объединяет4/20I общим параметром aggregation. `checkpoint_task.py` — общая dynamics reward-once задачи; `q_learning.py` — Q-table/Q-RNN.
+
+Модели не читают JSON и не импортируют `experiments`. Factory получает уже разрешённые параметры. Код среды формирует RBF/context; астроцитарный learner получает признаки, а не координаты/optimal actions. В памяти только реальные RSNN-состояния. Real familiarity читается до записи исхода; observer сохраняет версию памяти для проверки причинного порядка.
+
+`modified.py` задаёт репликации по картам/seed, проверяет manifest и неизменность весов evaluation, сохраняет метрики/навигацию. `modified_analysis.py` экспортирует training-AUC, графики, map-then-seed bootstrap и парные factorial-эффекты. Завершённые задачи кешируются, прерванная задача повторяется целиком. Конфиги latest MDP сохраняют исходные бюджеты250/300эпизодов,60финальных карт и seed72000..72002.
+
+Подробнее: [модифицированные модели и конфиги](docs/modified_astro.md).
+
+## Сохранённый протокол исходной статьи (`--legacy`)
+
 ```text
 src/astrorl/
   config.py          ModelConfig и настройки prediction-обучения

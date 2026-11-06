@@ -1,0 +1,9 @@
+{
+  "extends": "models/population.json",
+  "kind": "trace",
+  "memory": "memories/trace.json",
+  "motor": {
+    "extends": "motors/fixed.json",
+    "reliability": false
+  }
+}

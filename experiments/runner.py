@@ -1,4 +1,4 @@
-"""Run the article study with configured conditions or a parameter search."""
+"""Reproduce the legacy four-map article study or its original parameter search."""
 
 from . import engine as e
 from .configuration import study_configuration
@@ -26,9 +26,7 @@ def _final(configuration, selected, workers):
     assert len(selected) == 40 and set(mapping) == expected
     path = e.OUT / "locked_parameters.json"
     if path.exists():
-        assert e.read(path) == selected, (
-            "Condition parameters changed; use a different output directory."
-        )
+        assert e.read(path) == selected, "Condition parameters changed; use a different output directory."
     e.write(path, selected)
     tasks = make_tasks(
         configuration["maps"],
@@ -39,9 +37,7 @@ def _final(configuration, selected, workers):
     )
     rows = run_pool(tasks, "final", workers)
     assert len(rows) == 400
-    e.write(
-        e.OUT / "status.json", dict(stage="plotting", completed=400, total=400, workers=workers)
-    )
+    e.write(e.OUT / "status.json", dict(stage="plotting", completed=400, total=400, workers=workers))
     from .analysis import report
 
     report()
@@ -62,9 +58,7 @@ def tune(workers=30):
     configuration = _configuration("tune")
     specs = configuration["maps"]
     settings = e.read(e.CONFIGS / "tuning.json")
-    mapping = {
-        (g, k, s["name"]): candidates(k, g, s) for g in e.GROUPS for k in e.KINDS for s in specs
-    }
+    mapping = {(g, k, s["name"]): candidates(k, g, s) for g in e.GROUPS for k in e.KINDS for s in specs}
     e.write(
         e.OUT / "candidates.json",
         [dict(group=g, kind=k, map=m, configs=c) for (g, k, m), c in mapping.items()],

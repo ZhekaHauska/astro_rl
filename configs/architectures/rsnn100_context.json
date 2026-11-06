@@ -1,0 +1,31 @@
+{
+  "obs_dim": 2,
+  "n_actions": 4,
+  "neurons": 100,
+  "input_channels": 68,
+  "rsnn_steps": 128,
+  "input_action_gain": 0.0,
+  "input_probability_scale": 1.0,
+  "predictor_hidden": 128,
+  "predictor_scale": 1.0,
+  "bellec_options": {
+    "input_scale": 0.05,
+    "recurrent_scale": 0.1,
+    "tau_out_ms": 40.0,
+    "input_bias": true,
+    "adaptive_fraction": 0.5,
+    "tau_m_ms": 20.0,
+    "tau_a_ms": 2000.0,
+    "threshold": 0.6,
+    "damp": 0.3,
+    "n_ref": 5
+  },
+  "observation_channels": 64,
+  "rbf_width": 0.16,
+  "rbf_topk": 4,
+  "project_rbf": false,
+  "input_projection_std": 1.0,
+  "context_channels": 4,
+  "input_encoding": "rbf",
+  "calibration_context": true
+}

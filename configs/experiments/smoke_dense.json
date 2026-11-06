@@ -1,0 +1,15 @@
+{
+  "extends": "experiments/mdp_dense.json",
+  "name": "smoke_dense",
+  "protocol": {
+    "episodes": 2,
+    "eval_episodes": 1,
+    "families": [
+      "branching"
+    ],
+    "maps_per_family": 1,
+    "seeds": [
+      72000
+    ]
+  }
+}

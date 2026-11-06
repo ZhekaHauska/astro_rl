@@ -1,0 +1,10 @@
+{
+  "learner": "q",
+  "kind": "q_rnn",
+  "architecture": "architectures/rsnn100_rbf.json",
+  "parameters": "parameters/baselines.json",
+  "parameter_match": {
+    "kind": "q_rnn"
+  },
+  "parameter_overrides": {}
+}

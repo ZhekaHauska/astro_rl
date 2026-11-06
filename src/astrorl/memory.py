@@ -1,7 +1,33 @@
-"""Calcium familiarity memory, neuronal EMA trace and inhibitory gating."""
+"""RSNN activity normalization, calcium/EMA primitives and legacy gating.
+
+Population reads and dense-pattern familiarity are implemented in
+population_memory and dense_memory; no predicted activity is ever written.
+"""
 
 import numpy as np
 from numba import njit
+
+
+def rsnn_activity_code(rates, center, scale, mode="excess"):
+    """One fixed transform shared by actual writes and predicted queries.
+
+    The background is the original calibration, not an EMA. EMA is a distinct
+    neuronal-memory backend. Changing the calibration here would change the
+    published MDP mechanism and is intentionally not done during evaluation.
+    """
+    z, center, scale = np.asarray(rates, float), np.asarray(center), np.asarray(scale)
+    if z.ndim < 1 or center.ndim != 1 or scale.shape != center.shape or z.shape[-1] != len(center):
+        raise ValueError("RSNN rates and calibration dimensions differ")
+    if not all(np.isfinite(x).all() for x in (z, center, scale)) or (scale <= 0).any():
+        raise ValueError("Invalid RSNN activity/calibration")
+    if mode == "rate":
+        return np.clip(z / np.maximum(center + 3 / scale, 0.01), 0, 1)
+    values = (z - center) * scale
+    if mode == "excess":
+        return np.clip(values, 0, 3) / 3
+    if mode == "signed":
+        return values / np.sqrt(len(center))
+    raise ValueError("Unknown activity normalization")
 
 
 @njit(cache=True)
@@ -46,9 +72,7 @@ def calcium_step_sparse(g, ca, velocity, signal, duration, tau, amplitude, gthr)
         k = 0
         while k < count:
             current = bins[k]
-            gg, cc, vv = ca_gap(
-                g[i], ca[i], velocity[i], current - last - 1, dt, tau, amplitude, gthr
-            )
+            gg, cc, vv = ca_gap(g[i], ca[i], velocity[i], current - last - 1, dt, tau, amplitude, gthr)
             same = 1
             while k + same < count and bins[k + same] == current:
                 same += 1
@@ -90,9 +114,7 @@ class NeuronalTraceBank:
             self.slow = decay * self.slow + self.gain * (1 - decay) * x
 
     def active_memory(self):
-        return np.clip(
-            self.trace if self.second_tau is None else 0.5 * (self.trace + self.slow), 0, 1
-        )
+        return np.clip(self.trace if self.second_tau is None else 0.5 * (self.trace + self.slow), 0, 1)
 
     def familiarity(self, candidates):
         x = np.asarray(candidates)
@@ -134,12 +156,20 @@ class FamiliarityMemory:
         if self.kind == "trace":
             return self.trace.active_memory()
         cfg = self.p["astro"]
-        return np.clip(
-            (self.ca - cfg["threshold"]) / max(cfg["amplitude"] - cfg["threshold"], 1e-8), 0, 1
-        )
+        return np.clip((self.ca - cfg["threshold"]) / max(cfg["amplitude"] - cfg["threshold"], 1e-8), 0, 1)
 
     def familiarity(self, u):
         return u @ self.active() / np.maximum(u.sum(-1), 1e-8)
+
+    def read(self, query):
+        """Read-only global familiarity using the population reader contract."""
+        q = np.asarray(query)
+        single = q.ndim == 1
+        q = q[None] if single else q
+        if q.ndim != 2 or q.shape[1] != len(self.ca) or not np.isfinite(q).all() or (q < 0).any():
+            raise ValueError("Expected nonnegative RSNN queries")
+        f, mass = self.familiarity(q)[:, None], q.sum(1)[:, None]
+        return (f[0], mass[0]) if single else (f, mass)
 
 
 def gating(f, params):

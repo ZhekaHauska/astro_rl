@@ -1,0 +1,9 @@
+{
+  "extends": "models/population.json",
+  "kind": "astro",
+  "memory": "memories/astro.json",
+  "motor": {
+    "extends": "motors/fixed.json",
+    "reliability": false
+  }
+}

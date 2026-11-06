@@ -1,0 +1,6 @@
+{
+  "extends": "models/population.json",
+  "kind": "noastro",
+  "memory": "memories/none.json",
+  "motor": "motors/fixed.json"
+}

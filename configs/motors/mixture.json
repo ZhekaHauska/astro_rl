@@ -1,0 +1,7 @@
+{
+  "aggregation": "mixture",
+  "dt_ms": 3,
+  "steps": 60,
+  "weight_floor": 0.1,
+  "learn_weights": true
+}

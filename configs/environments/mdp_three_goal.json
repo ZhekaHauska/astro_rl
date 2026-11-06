@@ -1,0 +1,12 @@
+{
+  "task": "three_goal",
+  "max_steps": 150,
+  "modes": [
+    "ordered",
+    "unordered"
+  ],
+  "reward_goal": 1.0,
+  "step_penalty": 0.0,
+  "starts": "fixed",
+  "context": "remaining_checkpoints"
+}

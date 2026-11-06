@@ -1,0 +1,18 @@
+{
+  "learner": "adaptive",
+  "parameters": "parameters/adaptive.json",
+  "population": {
+    "cells": 5,
+    "overlap": 1,
+    "heterogeneous_tau": false,
+    "activity_code": "rate"
+  },
+  "kind": "astro",
+  "architecture": "architectures/rsnn100_rbf.json",
+  "memory_base": "memories/components.json",
+  "motor": "motors/mixture.json",
+  "parameter_match": {
+    "variant": "homogeneous"
+  },
+  "parameter_overrides": {}
+}

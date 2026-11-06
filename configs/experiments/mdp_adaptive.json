@@ -1,0 +1,10 @@
+{
+  "name": "mdp_adaptive_mixture",
+  "environment": "environments/mdp_single_goal.json",
+  "map_set": "maps/mdp_pool.json",
+  "models": {
+    "adaptive_equal": "models/adaptive_equal.json",
+    "adaptive_mixed": "models/adaptive_mixed.json"
+  },
+  "protocol": "protocols/adaptive.json"
+}

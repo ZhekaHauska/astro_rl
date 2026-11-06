@@ -1,0 +1,12 @@
+{
+  "extends": "memories/local_equal.json",
+  "backend": "whole",
+  "activity_code": "signed",
+  "kernel": {
+    "capacity": 50,
+    "sigma": 0.5,
+    "decay_steps": 12.0,
+    "features": 512,
+    "feature_seed": 73119
+  }
+}

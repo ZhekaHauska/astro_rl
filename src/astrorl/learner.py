@@ -1,4 +1,8 @@
-"""Prediction learning and detached motor reinforcement for all model conditions."""
+"""Shared detached motor learning and the legacy article prediction path.
+
+AdaptiveAstroLearner and PopulationLearner replace the legacy input-code target
+with actual next-RSNN activity and own the causal memory lifecycle.
+"""
 
 import copy
 import numpy as np
@@ -19,7 +23,10 @@ class Learner:
         self.rl = rl
         self.seed = seed
         self.hp = hp
-        self.baseline = np.zeros(50)
+        self.horizon = int(hp.get("horizon", 50))
+        if self.horizon < 1:
+            raise ValueError("horizon must be positive")
+        self.baseline = np.zeros(self.horizon)
         self.replay = []
         self.replay_rng = np.random.default_rng(seed + 711113)
         self.episode = 0
@@ -58,9 +65,7 @@ class Learner:
                 bias_trainable=True,
             )
             self.head = SpikingMotorHead(self.c.neurons, motor)
-            self.memory_params = copy.deepcopy(
-                memory_config["trace" if kind == "trace" else "astro"]
-            )
+            self.memory_params = copy.deepcopy(memory_config["trace" if kind == "trace" else "astro"])
             self.memory_params["astro"].update(
                 tau=hp["memory_tau"],
                 threshold=hp["memory_threshold"],
@@ -95,28 +100,19 @@ class Learner:
         )
 
     def backbone_hash(self):
-        return (
-            None
-            if self.is_mlp
-            else fingerprint([p.detach().numpy() for p in self.model.rnn.parameters()])
-        )
+        return None if self.is_mlp else fingerprint([p.detach().numpy() for p in self.model.rnn.parameters()])
 
     def reset(self):
         self.core = None if self.is_mlp else FastBellecCore(self.model.rnn)
 
     def schedule(self, ep, episodes):
         hp = self.hp
-        f = (
-            min(1.0, (ep - 1) / max(1.0, (episodes - 1) * hp["anneal_fraction"]))
-            if self.rl
-            else 0.0
-        )
+        f = min(1.0, (ep - 1) / max(1.0, (episodes - 1) * hp["anneal_fraction"])) if self.rl else 0.0
         self.entropy = hp["entropy"] + (hp["entropy_end"] - hp["entropy"]) * f
         self.actor_lr = hp["actor_lr"] + (hp["actor_lr_end"] - hp["actor_lr"]) * f
         if not self.is_mlp:
             self.head.temperature = (
-                hp["motor_temperature"]
-                + (hp["motor_temperature_end"] - hp["motor_temperature"]) * f
+                hp["motor_temperature"] + (hp["motor_temperature_end"] - hp["motor_temperature"]) * f
             )
             self.head.learning_rate = self.actor_lr
 
@@ -128,9 +124,7 @@ class Learner:
         if self.is_mlp:
             return dict(input_code=current_input)
         z, ei, er = self.core.observe(current_input, training, False)
-        return dict(
-            input_code=current_input, z=z, ei=ei if training else None, er=er if training else None
-        )
+        return dict(input_code=current_input, z=z, ei=ei if training else None, er=er if training else None)
 
     def prediction(self, obs, rep):
         if self.is_mlp:
@@ -147,14 +141,8 @@ class Learner:
         if self.is_mlp:
             output, cache = self.actor.forward(2 * np.asarray(obs) - 1)
             return softmax(output), cache, dict(motor_silent_fraction=0.0, mean_gate=0.0)
-        feature = (
-            self.model.features(torch.tensor(rep["z"], dtype=torch.float32))
-            .numpy()
-            .astype(np.float64)
-        )
-        p, cache, diag = self.head.forward(
-            feature, gate, self.memory_params["gate"]["gain"], float(memory_on)
-        )
+        feature = self.model.features(torch.tensor(rep["z"], dtype=torch.float32)).numpy().astype(np.float64)
+        p, cache, diag = self.head.forward(feature, gate, self.memory_params["gate"]["gain"], float(memory_on))
         diag["mean_gate"] = float(np.mean(gate))
         return p, cache, diag
 
@@ -165,11 +153,9 @@ class Learner:
                 delta, ret = credit(records, self.baseline, self.entropy)
                 x = np.asarray([2 * r["obs"] - 1 for r in records])
                 _, cache = self.actor.forward(x)
-                result["actor_gradient_norm"] = self.actor.step(
-                    self.actor.gradients(cache, delta), self.actor_lr
-                )
+                result["actor_gradient_norm"] = self.actor.step(self.actor.gradients(cache, delta), self.actor_lr)
             else:
-                grads, ret = self.head.gradients(records, self.baseline, self.entropy, horizon=50)
+                grads, ret = self.head.gradients(records, self.baseline, self.entropy, horizon=self.horizon)
                 result["actor_gradient_norm"] = self.head.step(grads)
             self.baseline[: len(records)] = 0.95 * self.baseline[: len(records)] + 0.05 * ret
         if self.is_mlp:
@@ -185,9 +171,7 @@ class Learner:
         m = self.model
         a = m
         s = self.settings
-        z = torch.tensor(
-            np.asarray([r["z"] for r in records]), dtype=torch.float32, requires_grad=True
-        )
+        z = torch.tensor(np.asarray([r["z"] for r in records]), dtype=torch.float32, requires_grad=True)
         m.prediction_optimizer.zero_grad(set_to_none=True)
         loss = prediction_batch_loss(m, z, records, s)
         loss.backward()
@@ -245,9 +229,7 @@ class Learner:
             delta = -2 * (predicted - target) * predicted * (1 - predicted) / predicted.size
             gradients = self.predictor.gradients(cache, delta, hidden=epoch == 0)
             norms.append(
-                self.predictor.step(
-                    gradients, hp["pred_lr"], hp["mlp_pred_hidden_lr"], hp["mlp_pred_hidden_cap"]
-                )
+                self.predictor.step(gradients, hp["pred_lr"], hp["mlp_pred_hidden_lr"], hp["mlp_pred_hidden_cap"])
             )
         return dict(
             prediction_loss=first_loss,
@@ -257,9 +239,7 @@ class Learner:
         )
 
     def metadata(self):
-        policy_count = sum(
-            p.size for p in (self.actor.p.values() if self.is_mlp else self.head.params.values())
-        )
+        policy_count = sum(p.size for p in (self.actor.p.values() if self.is_mlp else self.head.params.values()))
         total = sum(p.size for p in self.parameters())
         if self.kind == "random":
             total -= policy_count

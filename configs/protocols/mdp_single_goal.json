@@ -1,0 +1,36 @@
+{
+  "episodes": 250,
+  "eval_episodes": 100,
+  "families": [
+    "obstacles",
+    "rooms",
+    "branching"
+  ],
+  "map_split": "final",
+  "maps_per_family": 20,
+  "seeds": [
+    72000,
+    72001,
+    72002
+  ],
+  "groups": [
+    "rl",
+    "no_rl"
+  ],
+  "evaluation_modes": [
+    "learned",
+    "uniform",
+    "off",
+    "confidence_off",
+    "background_off",
+    "pooled_control"
+  ],
+  "seed_scheme": "single_goal_20261023",
+  "workers": 30,
+  "statistics": "statistics/map_cluster.json",
+  "validation": {
+    "require_prediction_updates": true,
+    "variance_floor": 1e-10,
+    "retained_variance_fraction": 0.1
+  }
+}

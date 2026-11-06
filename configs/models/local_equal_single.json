@@ -1,0 +1,5 @@
+{
+  "extends": "models/population.json",
+  "memory": "memories/local_equal.json",
+  "motor": "motors/single.json"
+}

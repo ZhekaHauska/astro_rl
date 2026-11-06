@@ -1,0 +1,4 @@
+{
+  "extends": "memories/astro.json",
+  "backend": "none"
+}

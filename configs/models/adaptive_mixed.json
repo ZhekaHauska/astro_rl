@@ -1,0 +1,9 @@
+{
+  "extends": "models/adaptive_equal.json",
+  "population": {
+    "heterogeneous_tau": true
+  },
+  "parameter_match": {
+    "variant": "heterogeneous"
+  }
+}

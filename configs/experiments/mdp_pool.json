@@ -1,0 +1,10 @@
+{
+  "name": "mdp_local_pool",
+  "environment": "environments/mdp_single_goal.json",
+  "map_set": "maps/mdp_pool.json",
+  "models": {
+    "local_equal_pool": "models/local_equal_pool.json",
+    "local_mixed_pool": "models/local_mixed_pool.json"
+  },
+  "protocol": "protocols/mdp_single_goal.json"
+}

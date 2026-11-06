@@ -1,0 +1,20 @@
+{
+  "name": "mdp_current_controls",
+  "environment": "environments/mdp_single_goal.json",
+  "map_set": "maps/mdp_pool.json",
+  "models": {
+    "noastro": "models/noastro.json",
+    "astro": "models/astro.json",
+    "trace": "models/trace.json",
+    "random": "models/random.json",
+    "q_rnn": "models/q_rnn.json",
+    "q_table": "models/q_table.json"
+  },
+  "protocol": {
+    "extends": "protocols/mdp_single_goal.json",
+    "evaluation_modes": [
+      "learned",
+      "off"
+    ]
+  }
+}

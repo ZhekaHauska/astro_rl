@@ -1,0 +1,4 @@
+{
+  "extends": "models/population.json",
+  "memory": "memories/whole.json"
+}

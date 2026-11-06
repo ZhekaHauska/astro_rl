@@ -1,0 +1,7 @@
+{
+  "extends": "models/population.json",
+  "memory": "memories/local_mixed.json",
+  "parameter_match": {
+    "variant": "heterogeneous"
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "extends": "memories/whole.json",
+  "backend": "rff"
+}

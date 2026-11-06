@@ -1,0 +1,4 @@
+{
+  "extends": "motors/single.json",
+  "learn_paths": false
+}
